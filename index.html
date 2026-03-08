@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Tabela punktów chwały</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🏆 Tabela punktów chwały</h1>
+
+    <!-- RANKING -->
+    <div class="card">
+      <h2>Ranking</h2>
+      <p id="currentDateDisplay"></p>
+      <table id="rankingTable"></table>
+    </div>
+
+    <!-- DATA (wyśrodkowana) -->
+    <div class="card center">
+      <h2>Wybierz datę</h2>
+      <input type="date" id="datePicker" />
+    </div>
+
+    <!-- PANELE -->
+    <div id="panels"></div>
+
+    <!-- DODAJ GRACZA -->
+    <div class="card">
+      <h2>Dodaj gracza</h2>
+      <input type="text" id="newPlayerName" placeholder="Imię gracza" />
+      <button id="addPlayerBtn">Dodaj</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="main.js"></script>
+</body>
+</html>

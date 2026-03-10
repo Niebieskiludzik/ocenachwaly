@@ -1,7 +1,7 @@
 /* Body i container */
 body {
   font-family: 'Segoe UI', sans-serif;
-  background: #0f172a;
+  background: linear-gradient(45deg, #0f172a, #0e0f21);
   color: #f1f5f9;
   margin: 0;
 }
@@ -17,7 +17,7 @@ h1 {
 
 /* Karty */
 .card {
-  background: #1e293b;
+  background: linear-gradient(45deg, #1e293b, #1d3254);
   padding: 25px;
   margin: 20px 0;
   border-radius: 16px;
@@ -51,7 +51,7 @@ tr:hover {
   background: #334155;
 }
 .leader {
-  background: linear-gradient(90deg, #ffd700, #ffc700);
+  background: linear-gradient(90deg, #bd960b, #bd770d);
   font-weight: bold;
   color: black;
   border-radius: 12px;
@@ -100,13 +100,13 @@ button {
   padding: 8px 14px;
   border-radius: 8px;
   border: none;
-  background: #6366f1;
+  background: #72898f;
   color: white;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 button:hover {
-  background: #818cf8;
+  background: #51808f;
   transform: scale(1.05);
 }
 
@@ -135,12 +135,12 @@ button:hover {
 }
 
 .absence-btn {
-  background: #dc2626;
+  background: #7d4040;
   margin-top: 10px;
   width: 100%;
   font-weight: bold;
 }
 
 .absence-btn:hover {
-  background: #ef4444;
+  background: #662929;
 }

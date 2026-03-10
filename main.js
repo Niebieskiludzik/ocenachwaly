@@ -130,7 +130,7 @@ function renderPanels() {
       <button onclick="saveVotes('${voter.name}')">Zapisz oceny</button>
       <button class="absence-btn"
       onclick="markAbsent('${voter.id}')">
-      Nieobecność (-20)
+      Nieobecność
       </button>
     `;
 
@@ -152,10 +152,10 @@ window.markAbsent = async function (playerId) {
 
   await supabase
     .from('players')
-    .update({ rating: player.rating - 20 })
+    .update({ rating: player.rating - 0 })
     .eq('id', playerId);
 
-  alert('Dodano nieobecność -20');
+  alert('Dodano nieobecność');
 
   await loadPlayers();
 };

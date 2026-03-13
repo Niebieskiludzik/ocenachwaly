@@ -9,6 +9,25 @@
   <div class="container">
     <h1>🏆 Tabela punktów chwały</h1>
 
+  <div class="card center" id="loginCard">
+
+    <h2>Logowanie</h2>
+
+    <input type="email" id="email" placeholder="Email">
+    <br>
+
+    <input type="password" id="password" placeholder="Hasło">
+    <br><br>
+
+    <button onclick="login()">Zaloguj</button>
+
+  </div>
+
+  <div class="center" id="logoutBox" style="display:none;">
+    <button onclick="logout()">Wyloguj</button>
+  </div>
+
+    
     <!-- RANKING -->
     <div class="card">
       <h2>Ranking</h2>
@@ -16,6 +35,27 @@
       <table id="rankingTable"></table>
     </div>
 
+    <div class="card">
+  <h2>📜 Instrukcja</h2>
+
+  <p><b>1. Logowanie</b><br>
+  Zaloguj się swoim kontem. Każdy gracz może oceniać tylko jako siebie.</p>
+
+  <p><b>2. Ocenianie</b><br>
+  Wpisz punkty dla każdego gracza w skali od <b>1 do 10</b>.
+  Można używać też liczb dziesiętnych, np. <b>8.5</b> lub <b>7,8</b>.</p>
+
+  <p><b>3. Zapis</b><br>
+  Po wpisaniu ocen kliknij <b>Zapisz oceny</b>, aby zapisać rundę.</p>
+
+  <p><b>4. Nieobecność</b><br>
+  Jeśli gracz jest nieobecny, <b>nic</b> nie wpisuj.</p>
+
+  <p><b>5. Ranking</b><br>
+  Ranking aktualizuje się automatycznie po zapisaniu ocen.</p>
+
+</div>
+    
     <!-- DATA (wyśrodkowana) -->
     <div class="card center">
       <h2>Wybierz datę</h2>

@@ -13,6 +13,7 @@ const datePicker = document.getElementById('datePicker');
 const rankingTable = document.getElementById('rankingTable');
 const panelsDiv = document.getElementById('panels');
 const loginCard = document.getElementById('loginCard');
+const dateCard = document.getElementById("dateCard");
 
 datePicker.value = new Date().toISOString().split('T')[0];
 
@@ -112,12 +113,31 @@ async function renderPanels() {
 
   panelsDiv.innerHTML = '';
 
-  const { data } = await supabase.auth.getUser();
-  const userEmail = data.user?.email;
+  const { data: userData } = await supabase.auth.getUser();
+  const userEmail = userData.user?.email;
 
   const currentPlayer = players.find(p => p.email === userEmail);
 
   if (!currentPlayer) return;
+
+  const selectedDate = new Date(datePicker.value);
+  const today = new Date();
+
+  selectedDate.setHours(0,0,0,0);
+  today.setHours(0,0,0,0);
+
+  const threeDaysBefore = new Date(selectedDate);
+  threeDaysBefore.setDate(selectedDate.getDate() - 3);
+
+  let votingAllowed = true;
+
+  if (currentPlayer.role !== "admin") {
+
+    if (today > selectedDate || today < threeDaysBefore) {
+      votingAllowed = false;
+    }
+
+  }
 
   let voters = [];
 
@@ -140,8 +160,14 @@ async function renderPanels() {
       html += `
         <div class="vote-row">
           <div>${player.name}</div>
-          <input type="number" min="1" max="10"
-          id="${voter.id}_${player.id}" />
+          <input 
+            type="number"
+            step="0.1"
+            min="1"
+            max="10"
+            ${!votingAllowed ? "disabled" : ""}
+            id="${voter.id}_${player.id}"
+          />
         </div>
       `;
 
@@ -151,13 +177,25 @@ async function renderPanels() {
 
     html += `
       <div class="panel-buttons">
-        <button onclick="saveVotes('${voter.name}')">Zapisz oceny</button>
+        <button ${!votingAllowed ? "disabled" : ""} onclick="saveVotes('${voter.name}')">
+          Zapisz oceny
+        </button>
         <button class="absence-btn"
         onclick="markAbsent('${voter.id}')">
         Nieobecność
         </button>
       </div>
     `;
+
+    if (!votingAllowed) {
+
+      html += `
+        <p style="margin-top:20px;opacity:0.7;">
+        Głosowanie dostępne tylko od 3 dni przed datą rundy do dnia rundy.
+        </p>
+      `;
+
+    }
 
     card.innerHTML = html;
     panelsDiv.appendChild(card);
@@ -177,7 +215,7 @@ window.markAbsent = async function (playerId) {
 
   await supabase
     .from('players')
-    .update({ rating: player.rating - 0 })
+    .update({ rating: player.rating })
     .eq('id', playerId);
 
   alert('Dodano nieobecność');
@@ -274,7 +312,8 @@ async function init() {
     addPlayerSection.style.display = "none";
     logoutBox.style.display = "none";
 
-    datePicker.disabled = true;
+    dateCard.style.display = "none";
+    
 
   } else {
 
@@ -283,9 +322,10 @@ async function init() {
 
     logoutBox.style.display = "block";
 
+    dateCard.style.display = "block";
+
     datePicker.disabled = false;
 
-    // sprawdzamy czy użytkownik jest adminem
     const { data: player } = await supabase
       .from('players')
       .select('*')
@@ -293,13 +333,9 @@ async function init() {
       .single();
 
     if (player && player.role === "admin") {
-
       addPlayerSection.style.display = "block";
-
     } else {
-
       addPlayerSection.style.display = "none";
-
     }
 
   }
@@ -309,7 +345,7 @@ async function init() {
   await loadPlayers();
 
 }
-  
+
 await init();
 
 });

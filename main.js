@@ -239,8 +239,6 @@ window.markAbsent = async function (playerId) {
     .update({ rating: player.rating })
     .eq('id', playerId);
 
-  alert('Dodano nieobecność');
-
   await loadPlayers();
 };
 
@@ -288,16 +286,12 @@ window.login = async function () {
     return;
   }
 
-  alert("Zalogowano!");
-
   init();
 };
 
 window.logout = async function () {
 
   await supabase.auth.signOut();
-
-  alert("Wylogowano");
 
   location.reload();
 
@@ -324,28 +318,28 @@ async function init() {
 
   const addPlayerSection = document.getElementById("newPlayerName").parentElement;
   const logoutBox = document.getElementById("logoutBox");
+  const loginBox = document.getElementById("loginBox");
+  const dateCard = document.getElementById("dateCard");
 
   if (!data.user) {
 
     panelsDiv.style.display = "none";
-    loginCard.style.display = "block";
 
     addPlayerSection.style.display = "none";
+
     logoutBox.style.display = "none";
+    loginBox.style.display = "flex";
 
     dateCard.style.display = "none";
-    
 
   } else {
 
     panelsDiv.style.display = "block";
-    loginCard.style.display = "none";
 
     logoutBox.style.display = "block";
+    loginBox.style.display = "none";
 
     dateCard.style.display = "block";
-
-    datePicker.disabled = false;
 
     const { data: player } = await supabase
       .from('players')
@@ -354,9 +348,13 @@ async function init() {
       .single();
 
     if (player && player.role === "admin") {
+
       addPlayerSection.style.display = "block";
+
     } else {
+
       addPlayerSection.style.display = "none";
+
     }
 
   }

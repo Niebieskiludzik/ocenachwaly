@@ -1,5 +1,13 @@
 document.addEventListener("DOMContentLoaded", async () => {
 
+const savedEmail = localStorage.getItem("savedEmail");
+
+if(savedEmail){
+
+document.getElementById("email").value = savedEmail;
+
+}
+  
 const supabase = window.supabase.createClient(
   'https://wzanqzcjrpbhocrfcciy.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6YW5xemNqcnBiaG9jcmZjY2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzQ4MjUsImV4cCI6MjA4NzAxMDgyNX0.VNer3odvLPJzBbecICFZFw86SXvvCbEZDQNVciEm97k'
@@ -273,22 +281,40 @@ window.saveVotes = async function (voterName) {
 
 window.login = async function () {
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginBtn = document.getElementById("loginBtn");
+const errorBox = document.getElementById("loginError");
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
+const email = emailInput.value;
+const password = passwordInput.value;
 
-  if (error) {
-    alert("Błąd logowania");
-    return;
-  }
+errorBox.innerText = "";
 
-  init();
+loginBtn.innerText = "Logowanie...";
+loginBtn.classList.add("loading");
+
+const { error } = await supabase.auth.signInWithPassword({
+email: email,
+password: password
+});
+
+loginBtn.innerText = "Zaloguj";
+loginBtn.classList.remove("loading");
+
+if (error) {
+
+errorBox.innerText = "❌ Nieprawidłowy email lub hasło";
+
+return;
+
+}
+
+localStorage.setItem("savedEmail", email);
+
+init();
+
 };
-
 window.logout = async function () {
 
   await supabase.auth.signOut();
@@ -310,6 +336,38 @@ async function addPlayer() {
   await loadPlayers();
 }
 
+document.addEventListener("keydown", function(e){
+
+if(e.key === "Enter"){
+
+const email = document.getElementById("email");
+const password = document.getElementById("password");
+
+if(document.activeElement === email || document.activeElement === password){
+
+login();
+
+}
+
+}
+
+});  
+
+function updateNavbarDate(){
+
+const date = new Date(datePicker.value);
+
+const formatted = date.toLocaleDateString("pl-PL", {
+day:"numeric",
+month:"long",
+year:"numeric"
+});
+
+document.getElementById("navbarDate").innerText =
+"📅 " + formatted;
+
+}
+
 async function init() {
 
   console.log('INIT START');
@@ -317,7 +375,8 @@ async function init() {
   const { data } = await supabase.auth.getUser();
 
   const addPlayerSection = document.getElementById("newPlayerName").parentElement;
-  const logoutBox = document.getElementById("logoutBox");
+  const userBox = document.getElementById("userBox");
+  const userName = document.getElementById("userName");
   const loginBox = document.getElementById("loginBox");
   const dateCard = document.getElementById("dateCard");
 
@@ -327,7 +386,7 @@ async function init() {
 
     addPlayerSection.style.display = "none";
 
-    logoutBox.style.display = "none";
+    userBox.style.display = "none";
     loginBox.style.display = "flex";
 
     dateCard.style.display = "none";
@@ -336,7 +395,7 @@ async function init() {
 
     panelsDiv.style.display = "block";
 
-    logoutBox.style.display = "block";
+    userBox.style.display = "flex";
     loginBox.style.display = "none";
 
     dateCard.style.display = "block";
@@ -347,21 +406,30 @@ async function init() {
       .eq('email', data.user.email)
       .single();
 
-    if (player && player.role === "admin") {
+    if (player) {
 
-      addPlayerSection.style.display = "block";
+      userName.innerText = "👤 " + player.name;
 
-    } else {
+      if (player.role === "admin") {
 
-      addPlayerSection.style.display = "none";
+        addPlayerSection.style.display = "block";
+
+      } else {
+
+        addPlayerSection.style.display = "none";
+
+      }
 
     }
 
   }
 
   await ensureRound(datePicker.value);
-  updateDateDisplay();
+
+  updateNavbarDate();
+
   await loadYesterdayRatings();
+
   await loadPlayers();
 
 }

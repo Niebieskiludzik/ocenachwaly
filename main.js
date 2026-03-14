@@ -58,6 +58,24 @@ async function loadPlayers() {
   renderPanels();
 }
 
+function updateDateDisplay(){
+
+  const dateDisplay = document.getElementById("currentDateDisplay");
+
+  const date = new Date(datePicker.value);
+
+  const formatted =
+    date.toLocaleDateString("pl-PL", {
+      weekday:"long",
+      year:"numeric",
+      month:"long",
+      day:"numeric"
+    });
+
+  dateDisplay.innerHTML = "📅 Runda: <b>" + formatted + "</b>";
+
+}
+
 async function loadYesterdayRatings() {
 
   const { data } = await supabase
@@ -98,7 +116,10 @@ function renderRanking() {
           i === 2 ? 'bronze' : ''
       }">
         <td>${medal || i + 1}</td>
-        <td>${p.name}</td>
+        <td>
+        <span class="avatar">${p.avatar || "👤"}</span>
+        ${p.name}
+        </td>
         <td>${Math.round(p.rating)}</td>
         <td class="${diff >= 0 ? 'positive' : 'negative'}">
           ${diff >= 0 ? '+' : ''}${diff}
@@ -341,6 +362,7 @@ async function init() {
   }
 
   await ensureRound(datePicker.value);
+  updateDateDisplay();
   await loadYesterdayRatings();
   await loadPlayers();
 

@@ -25,7 +25,10 @@ const dateCard = document.getElementById("dateCard");
 
 datePicker.value = new Date().toISOString().split('T')[0];
 
-datePicker.addEventListener('change', init);
+datePicker.addEventListener('change', () => {
+  updateDateDisplay();
+  init();
+});
 document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
 
 async function ensureRound(date) {
@@ -64,6 +67,7 @@ async function loadPlayers() {
 
   renderRanking();
   renderPanels();
+  loadPenaltyPlayers();
 }
 
 function updateDateDisplay(){
@@ -128,7 +132,7 @@ function renderRanking() {
         <span class="avatar">${p.avatar || "👤"}</span>
         ${p.name}
         </td>
-        <td>${Math.round(p.rating)}</td>
+        <td>${Math.round(p.rating + (p.manual_points || 0))}</td>
         <td class="${diff >= 0 ? 'positive' : 'negative'}">
           ${diff >= 0 ? '+' : ''}${diff}
         </td>
@@ -371,6 +375,72 @@ document.getElementById("navbarDate").innerText =
 
 }
 
+function loadPenaltyPlayers(){
+
+const select=document.getElementById("penaltyPlayer");
+
+if(!select) return;
+
+select.innerHTML="";
+
+players.forEach(p=>{
+
+const opt=document.createElement("option");
+
+opt.value=p.id;
+opt.textContent=p.name;
+
+select.appendChild(opt);
+
+});
+
+}
+
+window.givePenalty=async function(){
+
+const playerId=document.getElementById("penaltyPlayer").value;
+const points=parseFloat(document.getElementById("penaltyPoints").value);
+
+if(!points) return;
+
+const player=players.find(p=>p.id==playerId);
+
+await supabase
+.from("players")
+.update({
+manual_points:(player.manual_points||0)-points
+})
+.eq("id",playerId);
+
+document.getElementById("penaltyPoints").value="";
+
+await loadPlayers();
+
+}
+
+window.giveBonus=async function(){
+
+const playerId=document.getElementById("penaltyPlayer").value;
+const points=parseFloat(document.getElementById("bonusPoints").value);
+
+if(!points) return;
+
+const player=players.find(p=>p.id==playerId);
+
+await supabase
+.from("players")
+.update({
+manual_points:(player.manual_points||0)+points
+})
+.eq("id",playerId);
+
+document.getElementById("bonusPoints").value="";
+
+await loadPlayers();
+
+}
+
+
 async function loadBoiskoCounter(){
 
 const today=new Date().toISOString().split("T")[0];
@@ -392,34 +462,28 @@ willCome+" / "+totalPlayers+" osób będzie dziś";
 
 async function init() {
 
-  console.log('INIT START');
-
   const { data } = await supabase.auth.getUser();
 
   const addPlayerSection = document.getElementById("newPlayerName").parentElement;
+  const penaltyBox = document.getElementById("adminPenaltyBox");
   const userBox = document.getElementById("userBox");
   const userName = document.getElementById("userName");
   const loginBox = document.getElementById("loginBox");
   const dateCard = document.getElementById("dateCard");
 
   if (!data.user) {
-
+    // Wylogowany użytkownik
     panelsDiv.style.display = "none";
-
     addPlayerSection.style.display = "none";
-
     userBox.style.display = "none";
     loginBox.style.display = "flex";
-
     dateCard.style.display = "none";
-
+    penaltyBox.style.display = "none";  // <-- ukryj panel admina
   } else {
-
+    // Zalogowany użytkownik
     panelsDiv.style.display = "block";
-
     userBox.style.display = "flex";
     loginBox.style.display = "none";
-
     dateCard.style.display = "block";
 
     const { data: player } = await supabase
@@ -429,36 +493,29 @@ async function init() {
       .single();
 
     if (player) {
-
-      userName.innerHTML =
-      `<span class="avatar">${player.avatar || "👤"}</span> ${player.name}`;
+      userName.innerHTML = `<span class="avatar">${player.avatar || "👤"}</span> ${player.name}`;
 
       if (player.role === "admin") {
-
         addPlayerSection.style.display = "block";
-
+        penaltyBox.style.display = "block"; // tylko admin widzi panel
       } else {
-
         addPlayerSection.style.display = "none";
-
+        penaltyBox.style.display = "none"; // player lub inna rola nie widzi panelu
       }
-
+    } else {
+      // użytkownik nie ma przypisanego rekordu w tabeli players
+      addPlayerSection.style.display = "none";
+      penaltyBox.style.display = "none";
     }
-
   }
 
   await ensureRound(datePicker.value);
-
   updateNavbarDate();
-
   loadBoiskoCounter();
-
   await loadYesterdayRatings();
-
   await loadPlayers();
-
 }
 
-await init();
+init();
 
 });

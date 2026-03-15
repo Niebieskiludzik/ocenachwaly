@@ -22,7 +22,7 @@ return days;
 
 };
 
-}
+})
 
 async function loadDays(){
 

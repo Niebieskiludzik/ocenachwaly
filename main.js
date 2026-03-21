@@ -1,17 +1,14 @@
 document.addEventListener("DOMContentLoaded", async () => {
 
+  initAuthUI();
+  
+const supabase = window.supabaseClient;
+
 const savedEmail = localStorage.getItem("savedEmail");
 
-if(savedEmail){
-
-document.getElementById("email").value = savedEmail;
-
+  if (savedEmail) {
+    document.getElementById("email").value = savedEmail;
 }
-  
-const supabase = window.supabase.createClient(
-  'https://wzanqzcjrpbhocrfcciy.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6YW5xemNqcnBiaG9jcmZjY2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzQ4MjUsImV4cCI6MjA4NzAxMDgyNX0.VNer3odvLPJzBbecICFZFw86SXvvCbEZDQNVciEm97k'
-);
 
 let players = [];
 let currentRoundId = null;
@@ -33,25 +30,30 @@ document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
 
 async function ensureRound(date) {
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('rounds')
     .select('*')
     .eq('round_date', date)
-    .single();
+    .maybeSingle();
 
   if (!data) {
 
-    const { data: newRound } = await supabase
-      .from('rounds')
-      .insert({ round_date: date })
-      .select()
-      .single();
+  const { data: newRound, error: insertError } = await supabase
+    .from('rounds')
+    .insert({ round_date: date })
+    .select()
+    .single();
 
-    currentRoundId = newRound.id;
+  if(insertError){
+    console.error("INSERT ROUND ERROR:", insertError);
+    return;
+  }
 
-  } else {
+  currentRoundId = newRound.id;
 
-    currentRoundId = data.id;
+} else {
+
+  currentRoundId = data.id;
 
   }
 }
@@ -286,50 +288,6 @@ window.saveVotes = async function (voterName) {
 
 };
 
-window.login = async function () {
-
-const emailInput = document.getElementById("email");
-const passwordInput = document.getElementById("password");
-const loginBtn = document.getElementById("loginBtn");
-const errorBox = document.getElementById("loginError");
-
-const email = emailInput.value;
-const password = passwordInput.value;
-
-errorBox.innerText = "";
-
-loginBtn.innerText = "Logowanie...";
-loginBtn.classList.add("loading");
-
-const { error } = await supabase.auth.signInWithPassword({
-email: email,
-password: password
-});
-
-loginBtn.innerText = "Zaloguj";
-loginBtn.classList.remove("loading");
-
-if (error) {
-
-errorBox.innerText = "❌ Nieprawidłowy email lub hasło";
-
-return;
-
-}
-
-localStorage.setItem("savedEmail", email);
-
-init();
-
-};
-window.logout = async function () {
-
-  await supabase.auth.signOut();
-
-  location.reload();
-
-};
-
 async function addPlayer() {
 
   const name = document.getElementById('newPlayerName').value;
@@ -456,7 +414,7 @@ const willCome=data.length;
 const totalPlayers=players.length;
 
 document.getElementById("boiskoCounter").innerText=
-willCome+" / "+totalPlayers+" osób będzie dziś";
+"Dziś będzie "+willCome+" osób";
 
 }
 

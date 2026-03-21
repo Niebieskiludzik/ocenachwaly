@@ -84,3 +84,21 @@ window.logout = async function () {
   await supabase.auth.signOut();
   location.reload();
 };
+
+document.addEventListener("keydown", function(e){
+
+  if(e.key === "Enter"){
+
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+
+    if(
+      document.activeElement === email ||
+      document.activeElement === password
+    ){
+      login();
+    }
+
+  }
+
+});

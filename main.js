@@ -130,7 +130,7 @@ function renderRanking() {
           i === 2 ? 'bronze' : ''
       }">
         <td>${medal || i + 1}</td>
-        <td>
+        <td onclick="goToProfile('${p.id}')" style="cursor:pointer;">
         <span class="avatar">${p.avatar || "👤"}</span>
         ${p.name}
         </td>
@@ -143,6 +143,10 @@ function renderRanking() {
   });
 
 }
+
+window.goToProfile = function(playerId){
+  window.location.href = `profile.html?id=${playerId}`;
+};
 
 async function renderPanels() {
 

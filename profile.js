@@ -58,9 +58,34 @@ if (count === 0) {
   max = 0;
 }
 
+const { data: votesHistory, error: votesError } = await supabase
+  .from("votes")
+  .select("score, created_at")
+  .eq("player_id", playerId)
+  .order("created_at", { ascending: true });
+
+console.log("VOTES:", votesHistory);
+console.log("ERROR:", votesError);
+
+let last30days = 0;
+
+if (votesHistory) {
+  const now = new Date();
+  const pastDate = new Date();
+  pastDate.setDate(now.getDate() - 30);
+
+  last30days = votesHistory
+    .filter(v => new Date(v.created_at) >= pastDate)
+    .reduce((sum, v) => sum + v.score, 0);
+}
+
 const manualPoints = player.manual_points || 0;
 
 const manualClass = manualPoints < 0 ? "minus" : "";
+
+const diff = totalPoints - last30days;
+  
+const diffClass = last30days >= 0 ? "plus" : "minus";
   
 document.getElementById("profileCard").innerHTML = `
   
@@ -74,6 +99,11 @@ document.getElementById("profileCard").innerHTML = `
     Punkty: <b>${totalPoints.toFixed(3).replace(".", ",")}</b>
   </div>
 
+  <div class="profile-history">
+    📅 Przez ostatnie 30 dni:
+    <b>${last30days.toFixed(1).replace(".", ",")}</b>
+  </div>
+  
   <div class="profile-stats">
     ⭐ Średnia: ${avg.toFixed(2).replace(".", ",")}
     <span class="divider">|</span>

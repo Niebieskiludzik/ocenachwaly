@@ -595,12 +595,79 @@ font-size:18px;
   color: #ef4444; /* czerwony */
 }
 
-.profile-diff.plus { color: #22c55e; }
-
-.profile-diff.minus { color: #ef4444; }
-
 .profile-history {
   margin-top: 15px;
   font-size: 20px;
   opacity: 0.85;
+}
+
+.profile-diff.plus { color: #22c55e; }
+
+.profile-diff.minus { color: #ef4444; }
+
+.profile-extra {
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+/* kolory */
+.profile-extra.votes {
+  color: #3b82f6; /* niebieski */
+}
+
+.profile-extra.days {
+  color: #10b981; /* zielony */
+}
+
+.profile-extra.rank {
+  color: #f59e0b; /* złoty */
+}
+
+.profile-history-list {
+  margin-top: 15px;
+}
+
+.history-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  margin-top: 4px;
+  background: #1f2937;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.history-date {
+  color: #9ca3af;
+}
+
+.history-name {
+  color: #e5e7eb;
+}
+
+.history-score {
+  font-weight: bold;
+  color: #22c55e;
+}
+
+.sub-info {
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 3px;
+}
+
+.profile-history-title {
+  margin-top: 20px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.history-block {
+  margin-top: 10px;
+}
+
+.history-subtitle {
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #9ca3af;
 }

@@ -568,7 +568,7 @@ font-size:18px;
 }
 
 .profile-stats {
-  margin-top:20px;
+  margin-top:15px;
   font-size:22px;
   opacity:0.9;
 }
@@ -579,13 +579,13 @@ font-size:18px;
 }
 
 .profile-max {
-  margin-top:20px;
-  font-size:22px;
+  margin-top:15px;
+  font-size:20px;
   color:#f59e0b;
 }
 
 .profile-manual {
-  margin-top: 25px;
+  margin-top: 15px;
   font-size: 20px;
   opacity: 0.9;
   color: #38bdf8; /* lekki niebieski */
@@ -596,8 +596,9 @@ font-size:18px;
 }
 
 .profile-history {
-  margin-top: 15px;
-  font-size: 20px;
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: 500;
   opacity: 0.85;
 }
 
@@ -606,8 +607,8 @@ font-size:18px;
 .profile-diff.minus { color: #ef4444; }
 
 .profile-extra {
-  margin-top: 10px;
-  font-size: 15px;
+  margin-top: 14px;
+  font-size: 24px;
 }
 
 /* kolory */
@@ -642,12 +643,12 @@ font-size:18px;
 }
 
 .history-name {
-  color: #e5e7eb;
+  color: #19195B;
 }
 
 .history-score {
   font-weight: bold;
-  color: #22c55e;
+  color: #19195b;
 }
 
 .sub-info {
@@ -670,4 +671,215 @@ font-size:18px;
   font-size: 14px;
   margin-bottom: 5px;
   color: #9ca3af;
+}
+
+.ranking-header {
+  margin-bottom: 15px;
+}
+
+.ranking-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  margin-top: 6px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+/* zielony gradient miejsc */
+.ranking-row:nth-child(1) { background: #14532d; }
+.ranking-row:nth-child(2) { background: #166534; }
+.ranking-row:nth-child(3) { background: #15803d; }
+.ranking-row:nth-child(n+4) { background: #052e16; }
+
+.ranking-row:hover {
+  transform: scale(1.02);
+}
+
+.rank {
+  font-weight: bold;
+  color: #bbf7d0;
+}
+
+.name {
+  color: #dcfce7;
+}
+
+.points {
+  color: #22c55e;
+  font-weight: bold;
+}
+
+/* 🏆 Ranking miesięczny */
+.ranking-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#monthPicker {
+  font-size: 30px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  background: #f0f8ff;
+}
+
+/* 📦 lista */
+#rankingList {
+  margin-top: 20px;
+}
+
+/* 📊 pojedynczy wiersz */
+.ranking-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 16px 20px;
+  margin-bottom: 10px;
+
+  border-radius: 14px;
+  background: linear-gradient(315deg, #90caf9, #bbdefb);
+
+  font-size: 20px;
+  font-weight: 500;
+
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.ranking-row:hover {
+  transform: scale(1.02);
+  background: linear-gradient(315deg, #90caf9, #90caf9);
+}
+
+/* 🥇🥈🥉 */
+.ranking-row:nth-child(1) {
+  background: linear-gradient(315deg, #90caf9, #dce775);
+  font-weight: bold;
+}
+
+.ranking-row:nth-child(2) {
+  background: linear-gradient(315deg, #90caf9, #c5e1a5);
+}
+
+.ranking-row:nth-child(3) {
+  background: linear-gradient(315deg, #90caf9, #a5d6a7);
+}
+
+/* 🔢 miejsce */
+.rank {
+  font-size: 64px;
+  font-weight: bold;
+  width: 40px;
+}
+
+/* 👤 imię */
+.name {
+  flex: 1;
+  text-align: center;
+  margin-left: 10px;
+  font-size: 50px;
+}
+
+/* ⭐ punkty */
+.points {
+  font-size: 50px;
+  font-weight: bold;
+}
+
+/* ❌ brak danych */
+#rankingList:empty::after {
+  content: "Brak danych";
+  display: block;
+  text-align: center;
+  font-size: 60px;
+  margin-top: 30px;
+  opacity: 0.7;
+}
+
+/* 🔙 przycisk powrotu */
+.backButton {
+  display: block;
+  text-align: center;
+  margin: 20px auto;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #90caf9;
+  color: black;
+  text-decoration: none;
+  font-size: 18px;
+  width: fit-content;
+}
+
+.backButton {
+  display: block;
+  text-align: center;
+  margin: 30px auto;
+
+  padding: 18px 40px; /* większy */
+  border-radius: 16px;
+
+  background: #90caf9;
+  color: black;
+  text-decoration: none;
+
+  font-size: 24px; /* było ~18 */
+  font-weight: 600;
+
+  width: fit-content;
+}
+
+.backButton:hover {
+  background: #64b5f6;
+  transform: scale(1.05);
+}
+
+/* 🏆 tytuł */
+h1 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* 🏆 przycisk ranking */
+.btn-ranking {
+  display: flex;              /* 🔥 klucz */
+  align-items: center;        /* pionowo */
+  justify-content: center;    /* poziomo */
+
+  padding: 14px 22px;
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, #81d4fa, #4fc3f7);
+  color: black;
+  text-decoration: none;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  height: 60px; /* żeby było co centrować */
+  min-width: 200px;
+
+  transition: 0.2s;
+}
+
+.boiskoButtonBox {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.profile-rank {
+  font-size: 22px !important;
+}
+
+#profileCard {
+  text-align: center;
+}
+
+#profileCard b {
+  font-size: 1.2em;
 }

@@ -295,7 +295,7 @@ document.getElementById("profileCard").innerHTML = `
 
     <div class="profile-manual ${manualClass}">
       ⚖️ Kary i bonusy suma:
-      <b>${manualPoints.toFixed(3).replace(".", ",")}</b>
+      <b>${manualPoints.toFixed(1).replace(".", ",")}</b>
     </div>
   
 `;

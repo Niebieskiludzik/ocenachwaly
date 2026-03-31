@@ -603,10 +603,10 @@ font-size:18px;
 }
 
 /* zielony gradient miejsc */
-.ranking-row:nth-child(1) { background: #14532d; }
-.ranking-row:nth-child(2) { background: #166534; }
-.ranking-row:nth-child(3) { background: #15803d; }
-.ranking-row:nth-child(n+4) { background: #052e16; }
+.ranking-row:nth-child(1) { background: #0d84b8; }
+.ranking-row:nth-child(2) { background: #105370; }
+.ranking-row:nth-child(3) { background: #0f4157; }
+.ranking-row:nth-child(n+4) { background: #0d2d3b; }
 
 .ranking-row:hover {
   transform: scale(1.02);
@@ -666,21 +666,21 @@ font-size:18px;
 
 .ranking-row:hover {
   transform: scale(1.02);
-  background: linear-gradient(315deg, #90caf9, #90caf9);
+  background: linear-gradient(315deg, #0d2d3b, #07171f);
 }
 
 /* 🥇🥈🥉 */
 .ranking-row:nth-child(1) {
-  background: linear-gradient(315deg, #90caf9, #a5d6a7);
+  background: linear-gradient(315deg, #0d84b8, #0a668f);
   font-weight: bold;
 }
 
 .ranking-row:nth-child(2) {
-  background: linear-gradient(315deg, #90caf9, #c5e1a5);
+  background: linear-gradient(315deg, #105370, #0a3345);
 }
 
 .ranking-row:nth-child(3) {
-  background: linear-gradient(315deg, #90caf9, #dce775);
+  background: linear-gradient(315deg, #0f4157, #08222e);
 }
 
 /* 🔢 miejsce */
@@ -952,4 +952,53 @@ h1 {
   font-size: 14px;
   color: #666;
   margin-top: 3px;
+}
+
+/* ranking miesięczny */
+.ranking-container {
+  color: white;
+}
+
+.ranking-container * {
+  color: white;
+}
+
+.ranking-table {
+  color: white;
+}
+
+.ranking-table td,
+.ranking-table th {
+  color: white;
+}
+
+.ranking-title {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.month-picker {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#monthPicker {
+  font-size: 18px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: none;
+}
+
+#monthTitle {
+  text-align: center;
+  font-size: 26px;
+  margin: 20px 0;
+}
+
+.backButton.big {
+  display: inline-block;
+  font-size: 22px;
+  padding: 12px 20px;
+  margin-bottom: 20px;
 }

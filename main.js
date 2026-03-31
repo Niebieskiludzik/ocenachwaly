@@ -409,16 +409,16 @@ const today=new Date().toISOString().split("T")[0];
 
 const {data}=await supabase
 .from("field_meetups")
-.select("*")
-.eq("date",today)
-.eq("status","yes");
+.select("status, extra_players")
+.eq("date", today);
 
-const willCome=data.length;
+const playersCount = data.filter(x => x.status === "yes").length;
+const extra = data?.[0]?.extra_players || 0;
 
-const totalPlayers=players.length;
+const total = playersCount + extra;
 
-document.getElementById("boiskoCounter").innerText=
-"Dziś będzie "+willCome+" osób";
+document.getElementById("boiskoCounter").innerText =
+`Dziś będzie ${total} osób`;
 
 }
 

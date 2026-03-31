@@ -538,94 +538,9 @@ font-size:18px;
   background:#475569;
 }
 
-.profile-avatar-circle {
-  width:120px;
-  height:120px;
-
-  margin:0 auto 20px;
-
-  border-radius:50%;
-
-  background:#0f172a; /* ciemniejsze tło */
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:50px;
-
-  box-shadow:0 10px 30px rgba(0,0,0,0.5);
-}
-
-.profile-name {
-  font-size:38px;
-  margin-bottom:15px;
-}
-
-.profile-points {
-  font-size:28px;
-  margin-top:10px;
-}
-
-.profile-stats {
-  margin-top:15px;
-  font-size:22px;
-  opacity:0.9;
-}
-
 .divider {
   margin:0 10px;
   opacity:0.5;
-}
-
-.profile-max {
-  margin-top:15px;
-  font-size:20px;
-  color:#f59e0b;
-}
-
-.profile-manual {
-  margin-top: 15px;
-  font-size: 20px;
-  opacity: 0.9;
-  color: #38bdf8; /* lekki niebieski */
-}
-
-.profile-manual.minus {
-  color: #ef4444; /* czerwony */
-}
-
-.profile-history {
-  margin-top: 10px;
-  font-size: 24px;
-  font-weight: 500;
-  opacity: 0.85;
-}
-
-.profile-diff.plus { color: #22c55e; }
-
-.profile-diff.minus { color: #ef4444; }
-
-.profile-extra {
-  margin-top: 14px;
-  font-size: 24px;
-}
-
-/* kolory */
-.profile-extra.votes {
-  color: #3b82f6; /* niebieski */
-}
-
-.profile-extra.days {
-  color: #10b981; /* zielony */
-}
-
-.profile-extra.rank {
-  color: #f59e0b; /* złoty */
-}
-
-.profile-history-list {
-  margin-top: 15px;
 }
 
 .history-row {
@@ -756,7 +671,7 @@ font-size:18px;
 
 /* 🥇🥈🥉 */
 .ranking-row:nth-child(1) {
-  background: linear-gradient(315deg, #90caf9, #dce775);
+  background: linear-gradient(315deg, #90caf9, #a5d6a7);
   font-weight: bold;
 }
 
@@ -765,7 +680,7 @@ font-size:18px;
 }
 
 .ranking-row:nth-child(3) {
-  background: linear-gradient(315deg, #90caf9, #a5d6a7);
+  background: linear-gradient(315deg, #90caf9, #dce775);
 }
 
 /* 🔢 miejsce */
@@ -872,14 +787,169 @@ h1 {
   margin-bottom: 20px;
 }
 
-.profile-rank {
-  font-size: 22px !important;
-}
-
+/* 📦 karta profilu */
 #profileCard {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 20px;
+
+  background: #f5faff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
   text-align: center;
 }
 
-#profileCard b {
-  font-size: 1.2em;
+/* 👤 avatar */
+.profile-avatar-circle {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 15px;
+
+  border-radius: 50%;
+  background: #e3f2fd;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 50px;
+}
+
+/* 🧑 nazwa */
+.profile-name {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+/* 💰 punkty */
+.profile-points {
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+/* 📊 sekcje */
+.profile-box {
+  font-size: 22px;
+  margin: 12px 0;
+}
+
+/* 📅 wyróżnienie */
+.profile-highlight {
+  font-size: 26px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+/* ➖ minusy */
+.minus {
+  color: red;
+}
+
+/* 🔙 przycisk powrotu */
+.backButton {
+  display: block;
+  margin: 40px auto;
+
+  padding: 18px 40px;
+  font-size: 26px;
+
+  background: #90caf9;
+  border-radius: 16px;
+  text-decoration: none;
+  color: black;
+
+  text-align: center;
+  width: fit-content;
+}
+
+.backButton:hover {
+  background: #64b5f6;
+}
+
+.extra-players-box {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.extra-players-box select {
+  margin-left: 10px;
+  padding: 8px 12px;
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+.extra-players-box {
+  margin-top: 10px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.extra-players-box select {
+  margin-left: 10px;
+  padding: 6px 10px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+.extra-info {
+  margin: 10px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1976d2;
+}
+
+#profileCard {
+  background: linear-gradient(135deg, #2d3959, #0b111f);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* teksty */
+.profile-box,
+.profile-points,
+.profile-name,
+.profile-highlight {
+  color: white;
+}
+
+/* delikatne sekcje */
+.profile-box {
+  opacity: 0.9;
+}
+
+.profile-section-title {
+  font-size: 24px;
+  margin-top: 25px;
+  font-weight: bold;
+}
+
+.votes-section {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.votes-column {
+  width: 45%;
+}
+
+.votes-column h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.vote-item {
+  background: rgba(255,255,255,0.1);
+  padding: 8px;
+  border-radius: 8px;
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+.vote-meta {
+  font-size: 14px;
+  color: #666;
+  margin-top: 3px;
 }

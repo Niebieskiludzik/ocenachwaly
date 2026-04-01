@@ -413,7 +413,10 @@ const {data}=await supabase
 .eq("date", today);
 
 const playersCount = data.filter(x => x.status === "yes").length;
-const extra = data?.[0]?.extra_players || 0;
+const extra = (data || []).reduce(
+  (sum, x) => sum + (x.extra_players || 0),
+  0
+);
 
 const total = playersCount + extra;
 

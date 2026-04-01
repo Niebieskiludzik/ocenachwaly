@@ -1,218 +1,175 @@
-document.addEventListener("DOMContentLoaded", async () => {
-    
-  initAuthUI(); // teraz auth.js musi być załadowany PRZED main.js/boisko.js
-    
-  const supabase = window.supabaseClient; // lokalnie w funkcji — OK
+var supabase = window.supabaseClient;
 
+document.addEventListener("DOMContentLoaded", async () => {
+  initAuthUI();
+  loadDays();
 });
 
 const daysContainer = document.getElementById("daysContainer");
-
 let currentStatus = {};
 
 function getNextDays(){
-
-const days=[];
-
-for(let i=0;i<3;i++){
-
-const d=new Date();
-d.setDate(d.getDate()+i);
-
-days.push(d.toISOString().split("T")[0]);
-
-}
-
-return days;
-
+  const days=[];
+  for(let i=0;i<3;i++){
+    const d=new Date();
+    d.setDate(d.getDate()+i);
+    days.push(d.toISOString().split("T")[0]);
+  }
+  return days;
 }
 
 async function loadDays(){
-
-daysContainer.innerHTML="";
-
-const days=getNextDays();
-
-for(const day of days){
-
-await renderDay(day);
-
-}
-
+  daysContainer.innerHTML="";
+  const days=getNextDays();
+  for(const day of days){
+    await renderDay(day);
+  }
 }
 
 async function renderDay(date){
 
-const {data:userData}=await supabaseClient.auth.getUser();
-const logged=userData.user;
+  const { data: userData } = await supabase.auth.getUser();
+  const logged = userData.user;
 
-const {data}=await supabaseClient
-.from("field_meetups")
-.select("*")
-.eq("date",date);
+  const { data } = await supabase
+    .from("field_meetups")
+    .select("*")
+    .eq("date",date);
 
-const card=document.createElement("div");
-card.className="card";
+  const card=document.createElement("div");
+  card.className="card";
 
-const dateFormatted=new Date(date).toLocaleDateString("pl-PL",{
-day:"numeric",
-month:"long"
-});
+  const dateFormatted=new Date(date).toLocaleDateString("pl-PL",{
+    day:"numeric",
+    month:"long"
+  });
 
-let html=`<h2>📅 ${dateFormatted}</h2>`;
+  let html=`<h2>📅 ${dateFormatted}</h2>`;
 
-if(!data || data.length===0){
+  if(!data || data.length===0){
+    html+=`<p>Pusto</p>`;
+  }else{
 
-html+=`<p>Pusto</p>`;
+    const yes=data.filter(x=>x.status==="yes");
+    const no=data.filter(x=>x.status==="no");
 
-}else{
+    html+=`<h3>Będą</h3>`;
 
-const yes=data.filter(x=>x.status==="yes");
-const no=data.filter(x=>x.status==="no");
+    yes.forEach(p=>{
+      html+=`<div><span class="avatar">${p.avatar || "👤"}</span>${p.player_name} ${formatTime(p)}</div>`;
+      if(p.note){
+        html+=`<div class="note">${p.note}</div>`;
+      }
+    });
 
-html+=`<h3>Będą</h3>`;
+    // ✅ FIX SUMA EXTRA
+    const extra = (data || []).reduce(
+      (sum, x) => sum + (x.extra_players || 0),
+      0
+    );
 
-yes.forEach(p=>{
+    html += `<div class="extra-info">👥 +${extra} dodatkowych osób</div>`;
 
-html+=`<div><span class="avatar">${p.avatar || "👤"}</span>${p.player_name} ${formatTime(p)}</div>`;
+    html+=`<h3>Nie będą</h3>`;
 
-if(p.note){
-html+=`<div class="note">${p.note}</div>`;
-}
+    no.forEach(p=>{
+      html+=`<div><span class="avatar">${p.avatar || "👤"}</span>${p.player_name}</div>`;
+      if(p.note){
+        html+=`<div class="note">${p.note}</div>`;
+      }
+    });
+  }
 
-});
+  if(logged){
+    html+=`
+    <hr>
 
-const extra = data?.[0]?.extra_players || 0;
+    <div class="meet-row">
+      Od <input type="time" id="from_${date}">
+      Do <input type="time" id="to_${date}">
+      <label class="sunsetBox">
+        <input type="checkbox" id="sunset_${date}">
+        do zachodu
+      </label>
+    </div>
 
-html += `<div class="extra-info">👥 +${extra} dodatkowych osób</div>`;
+    <div class="extra-players-box">
+      👥 Dodatkowe osoby:
+      <select id="extra_${date}">
+        ${[...Array(16).keys()].map(i => `<option value="${i}">${i}</option>`).join("")}
+      </select>
+    </div>
 
-html+=`<h3>Nie będą</h3>`;
+    <input id="note_${date}" maxlength="100" placeholder="opis (opcjonalnie)">
 
-no.forEach(p=>{
+    <div class="status-row">
+      <button class="statusBtn" onclick="setStatus('${date}','yes',this)">Będę</button>
+      <button class="statusBtn" onclick="setStatus('${date}','no',this)">Nie będę</button>
+    </div>
 
-html+=`<div><span class="avatar">${p.avatar || "👤"}</span>${p.player_name}</div>`;
+    <button class="saveBtn" onclick="save('${date}')">Zapisz</button>
+    `;
+  }
 
-if(p.note){
-html+=`<div class="note">${p.note}</div>`;
-}
-
-});
-
-}
-
-if(logged){
-
-html+=`
-
-<hr>
-
-<div class="meet-row">
-
-Od <input type="time" id="from_${date}">
-Do <input type="time" id="to_${date}">
-
-<label class="sunsetBox">
-<input type="checkbox" id="sunset_${date}">
-do zachodu
-</label>
-
-</div>
-
-<div class="extra-players-box">
-  👥 Dodatkowe osoby:
-  <select id="extra_${date}">
-    ${[...Array(16).keys()].map(i => `<option value="${i}">${i}</option>`).join("")}
-  </select>
-</div>
-
-<input id="note_${date}" maxlength="100" placeholder="opis (opcjonalnie)">
-
-<div class="status-row">
-
-<button class="statusBtn" onclick="setStatus('${date}','yes',this)">Będę</button>
-
-<button class="statusBtn" onclick="setStatus('${date}','no',this)">Nie będę</button>
-
-</div>
-
-<button class="saveBtn" onclick="save('${date}')">Zapisz</button>
-
-`;
-
-}
-
-card.innerHTML=html;
-
-daysContainer.appendChild(card);
-
+  card.innerHTML=html;
+  daysContainer.appendChild(card);
 }
 
 function formatTime(p){
-
-let from=p.time_from||"-:-";
-let to=p.time_to||"-:-";
-
-if(to==="sunset"){
-to="zachodu słońca";
-}
-
-return `od ${from} do ${to}`;
-
+  let from=p.time_from||"-:-";
+  let to=p.time_to||"-:-";
+  if(to==="sunset") to="zachodu słońca";
+  return `od ${from} do ${to}`;
 }
 
 function setStatus(date,status,btn){
-
-currentStatus[date]=status;
-
-const buttons=btn.parentElement.querySelectorAll(".statusBtn");
-
-buttons.forEach(b=>b.classList.remove("active"));
-
-btn.classList.add("active");
-
+  currentStatus[date]=status;
+  const buttons=btn.parentElement.querySelectorAll(".statusBtn");
+  buttons.forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
 }
 
 async function save(date){
 
-const {data:userData}=await supabaseClient.auth.getUser();
+  // ✅ blokada
+  if (!currentStatus[date]) {
+    alert("Wybierz czy będziesz");
+    return;
+  }
 
-if(!userData.user) return;
+  const { data: userData } = await supabase.auth.getUser();
+  if(!userData.user) return;
 
-const email=userData.user.email;
+  const email=userData.user.email;
 
-const {data:player}=await supabaseClient
-.from("players")
-.select("*")
-.eq("email",email)
-.single();
+  const {data:player}=await supabase
+    .from("players")
+    .select("*")
+    .eq("email",email)
+    .single();
 
-const from=document.getElementById("from_"+date).value;
+  const from=document.getElementById("from_"+date).value;
+  let to=document.getElementById("to_"+date).value;
 
-let to=document.getElementById("to_"+date).value;
+  if(document.getElementById("sunset_"+date).checked){
+    to="sunset";
+  }
 
-const sunset=document.getElementById("sunset_"+date).checked;
+  const note=document.getElementById("note_"+date).value;
+  const extraPlayers = document.getElementById(`extra_${date}`).value;
 
-if(sunset) to="sunset";
+  await supabase
+    .from("field_meetups")
+    .upsert({
+      player_id: player.id,
+      player_name: player.name,
+      date: date,
+      status: currentStatus[date],
+      time_from: from,
+      time_to: to,
+      note: note,
+      extra_players: extraPlayers
+    });
 
-const note=document.getElementById("note_"+date).value;
-
-const extraPlayers = document.getElementById(`extra_${date}`).value;
-
-await supabaseClient
-.from("field_meetups")
-.upsert({
-  player_id: player.id,
-  player_name: player.name,
-  date: date,
-  status: currentStatus[date],
-  time_from: from,
-  time_to: to,
-  note: note,
-  extra_players: extraPlayers
-});
-
-loadDays();
-
+  loadDays();
 }
-
-loadDays();

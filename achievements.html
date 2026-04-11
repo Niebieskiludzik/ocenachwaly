@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Osiągnięcia</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="profile.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="navbar">
+
+  <div class="nav-left">
+    🏅 Osiągnięcia
+  </div>
+
+  <div class="nav-center">
+    <span id="navbarDate"></span>
+  </div>
+
+  <div class="nav-right">
+
+    <div id="loginBox">
+      <input id="email" placeholder="email">
+      <input id="password" type="password" placeholder="hasło">
+      <button onclick="login()">Zaloguj</button>
+      <div id="loginError"></div>
+    </div>
+
+    <div id="userBox" style="display:none;">
+      <span id="userName"></span>
+      <button onclick="logout()">Wyloguj</button>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="container">
+
+  <a href="javascript:history.back()" class="backButton">
+    ⬅ Powrót do rankingu
+  </a>
+
+  <div id="playerHeader"></div>
+
+  <div class="profile-section-title">
+    🏅 Osiągnięcia
+  </div>
+
+  <div id="achievementsGrid" class="achievements-grid"></div>
+
+</div>
+
+<script src="auth.js"></script>
+<script src="achievements.js"></script>
+
+</body>
+</html>

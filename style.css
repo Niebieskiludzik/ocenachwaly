@@ -1091,7 +1091,7 @@ h1 {
 }
 
 .simple-ranking-btn:hover {
-  background: #2a1740;
+  background: linear-gradient(130deg, #2a1740, #663399);
 }
 
 .rank-name {
@@ -1102,15 +1102,15 @@ h1 {
 
 
 .top1 {
-  background: linear-gradient(90deg, #3a2a00, #140a24);
+  background: linear-gradient(90deg, #FFCC00, #FFCC99);
 }
 
 .top2 {
-  background: linear-gradient(90deg, #2a2a2a, #140a24);
+  background: linear-gradient(90deg, #999999, #CCCCCC);
 }
 
 .top3 {
-  background: linear-gradient(90deg, #1f1f1f, #140a24);
+  background: linear-gradient(90deg, #996633, #CC9966);
 }
 
 .rank-left {
@@ -1135,4 +1135,16 @@ h1 {
 .achievements-btn:hover {
   background: #2a1740;
   transform: scale(1.05);
+}
+
+.gold {
+  background: linear-gradient(90deg, #ffd700, #1c1c1c);
+}
+
+.silver {
+  background: linear-gradient(90deg, #c0c0c0, #1c1c1c);
+}
+
+.bronze {
+  background: linear-gradient(90deg, #cd7f32, #1c1c1c);
 }

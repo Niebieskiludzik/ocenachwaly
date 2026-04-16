@@ -60,50 +60,33 @@ async function ensureRound(date) {
 
 async function loadPlayers() {
 
-  if (!currentRoundId) {
-    console.warn("Brak roundId – biorę najnowszy");
+  const { data: playersData } = await supabase
+    .from("players")
+    .select("*");
 
-    const { data: lastRound } = await supabase
-      .from("rounds")
-      .select("id")
-      .order("round_date", { ascending: false })
-      .limit(1)
-      .single();
-
-    if (!lastRound) return;
-
-    currentRoundId = lastRound.id;
-  }
-
-  const { data } = await supabase
+  const { data: history } = await supabase
     .from("ranking_history")
-    .select(`
-      player_id,
-      points,
-      points_yesterday,
-      players (name, avatar)
-    `)
-    .eq("round_id", currentRoundId)
-    .order("points", { ascending: false });
+    .select("*")
+    .eq("round_id", currentRoundId);
 
-  if (!data || data.length === 0) {
-    console.warn("Brak danych ranking_history");
-    players = [];
-    return;
-  }
+  if (!playersData) return;
 
-  players = data.map(r => ({
-    id: r.player_id,
-    name: r.players.name,
-    avatar: r.players.avatar,
-    rating: r.points,
-    yesterday: r.points_yesterday
+  const historyMap = {};
+  history?.forEach(h => {
+    historyMap[h.player_id] = h;
+  });
+
+  players = playersData.map(p => ({
+    id: p.id,
+    name: p.name,
+    avatar: p.avatar,
+    rating: historyMap[p.id]?.points ?? p.rating ?? 1000,
+    yesterday: historyMap[p.id]?.points_yesterday ?? p.rating
   }));
 
   renderRanking();
   renderPanels();
 }
-
 function updateDateDisplay(){
 
   const dateDisplay = document.getElementById("currentDateDisplay");
@@ -183,7 +166,11 @@ async function renderPanels() {
   const { data: userData } = await supabase.auth.getUser();
   const userEmail = userData.user?.email;
 
-  const currentPlayer = players.find(p => p.email === userEmail);
+  const { data: currentPlayer } = await supabase
+  .from("players")
+  .select("*")
+  .eq("email", userEmail)
+  .single();
 
   const selectedDate = new Date(datePicker.value);
   const today = new Date();
@@ -462,7 +449,14 @@ async function saveRankingHistory() {
       .eq("round_id", currentRoundId)
       .maybeSingle();
 
-    if (exists) continue;
+    await supabase
+  .from("ranking_history")
+  .upsert({
+    player_id: p.id,
+    round_id: currentRoundId,
+    points: p.rating + (p.manual_points || 0),
+    points_yesterday: p.yesterday || p.rating
+  });
 
     const todayPoints = p.rating;
     const yesterday = p.yesterday || todayPoints;

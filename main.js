@@ -60,16 +60,48 @@ async function ensureRound(date) {
 
 async function loadPlayers() {
 
-  const { data } = await supabase
-    .from('players')
-    .select('*')
-    .order('rating', { ascending: false });
+  if (!currentRoundId) {
+    console.warn("Brak roundId – biorę najnowszy");
 
-  players = data || [];
+    const { data: lastRound } = await supabase
+      .from("rounds")
+      .select("id")
+      .order("round_date", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (!lastRound) return;
+
+    currentRoundId = lastRound.id;
+  }
+
+  const { data } = await supabase
+    .from("ranking_history")
+    .select(`
+      player_id,
+      points,
+      points_yesterday,
+      players (name, avatar)
+    `)
+    .eq("round_id", currentRoundId)
+    .order("points", { ascending: false });
+
+  if (!data || data.length === 0) {
+    console.warn("Brak danych ranking_history");
+    players = [];
+    return;
+  }
+
+  players = data.map(r => ({
+    id: r.player_id,
+    name: r.players.name,
+    avatar: r.players.avatar,
+    rating: r.points,
+    yesterday: r.points_yesterday
+  }));
 
   renderRanking();
   renderPanels();
-  loadPenaltyPlayers();
 }
 
 function updateDateDisplay(){
@@ -103,7 +135,7 @@ async function loadYesterdayRatings() {
   });
 }
 
-function renderRanking() {
+  async function renderRanking() {
 
   rankingTable.innerHTML = `
     <tr>
@@ -121,33 +153,29 @@ function renderRanking() {
     if (i === 1) medal = '🥈';
     if (i === 2) medal = '🥉';
 
-    const diff = Math.round(p.rating - (yesterdayRatings[p.id] || p.rating));
+    const diff = Math.round(p.rating - (p.yesterday || p.rating));
 
     rankingTable.innerHTML += `
-      <tr class="${
-          i === 0 ? 'leader gold' :
-          i === 1 ? 'silver' :
-          i === 2 ? 'bronze' : ''
-      }">
+      <tr class="${i === 0 ? 'leader gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
         <td>${medal || i + 1}</td>
-        <td onclick="goToProfile('${p.id}')" style="cursor:pointer;">
-        <span class="avatar">${p.avatar || "👤"}</span>
-        ${p.name}
+        <td onclick="goToProfile('${p.id}')">
+          <span class="avatar">${p.avatar || "👤"}</span>
+          ${p.name}
         </td>
-        <td>${Math.round(p.rating + (p.manual_points || 0))}</td>
+        <td>${Math.round(p.rating)}</td>
         <td class="${diff >= 0 ? 'positive' : 'negative'}">
           ${diff >= 0 ? '+' : ''}${diff}
         </td>
       </tr>
     `;
   });
-
 }
-
+  
 window.goToProfile = function(playerId){
   window.location.href = `profile.html?id=${playerId}`;
 };
 
+  
 async function renderPanels() {
 
   panelsDiv.innerHTML = '';
@@ -156,8 +184,6 @@ async function renderPanels() {
   const userEmail = userData.user?.email;
 
   const currentPlayer = players.find(p => p.email === userEmail);
-
-  if (!currentPlayer) return;
 
   const selectedDate = new Date(datePicker.value);
   const today = new Date();
@@ -281,7 +307,7 @@ window.saveVotes = async function (voterName) {
       voter_name: voterName,
       score: parseFloat(input.value.replace(",", "."))
     });
-
+  
   }
 
   await supabase.rpc('calculate_round', {
@@ -289,7 +315,7 @@ window.saveVotes = async function (voterName) {
   });
 
   await loadPlayers();
-
+  await saveRankingHistory();
 };
 
 async function addPlayer() {
@@ -423,6 +449,32 @@ const total = playersCount + extra;
 document.getElementById("boiskoCounter").innerText =
 `Dziś będzie ${total} osób`;
 
+}
+
+async function saveRankingHistory() {
+
+  for (let p of players) {
+
+    const { data: exists } = await supabase
+      .from("ranking_history")
+      .select("id")
+      .eq("player_id", p.id)
+      .eq("round_id", currentRoundId)
+      .maybeSingle();
+
+    if (exists) continue;
+
+    const todayPoints = p.rating;
+    const yesterday = p.yesterday || todayPoints;
+
+    await supabase.from("ranking_history").insert({
+      player_id: p.id,
+      round_id: currentRoundId,
+      points: todayPoints,
+      points_yesterday: yesterday
+    });
+
+  }
 }
 
 async function init() {

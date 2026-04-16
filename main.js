@@ -84,6 +84,8 @@ async function loadPlayers() {
     yesterday: historyMap[p.id]?.points_yesterday ?? p.rating
   }));
 
+  players.sort((a, b) => b.rating - a.rating);
+
   renderRanking();
   renderPanels();
 }

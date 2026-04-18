@@ -60,35 +60,43 @@ async function ensureRound(date) {
 
 async function loadPlayers() {
 
+  // 1. players
   const { data: playersData } = await supabase
     .from("players")
     .select("*");
 
+  if (!playersData) return;
+
+  // 2. ranking history (jeśli chcesz snapshoty)
   const { data: history } = await supabase
     .from("ranking_history")
     .select("*")
-    .eq("round_id", currentRoundId);
-
-  if (!playersData) return;
+    .eq("date", new Date().toISOString().split("T")[0]);
 
   const historyMap = {};
-  history?.forEach(h => {
-    historyMap[h.player_id] = h;
-  });
 
+  if (Array.isArray(history)) {
+    history.forEach(h => {
+      historyMap[h.player_id] = h;
+    });
+  }
+
+  // 3. mapowanie graczy
   players = playersData.map(p => ({
     id: p.id,
     name: p.name,
     avatar: p.avatar,
-    rating: historyMap[p.id]?.points ?? p.rating ?? 1000,
-    yesterday: historyMap[p.id]?.points_yesterday ?? p.rating
+    rating: p.rating
   }));
 
+  // 4. sort
   players.sort((a, b) => b.rating - a.rating);
 
+  // 5. render
   renderRanking();
   renderPanels();
 }
+  
 function updateDateDisplay(){
 
   const dateDisplay = document.getElementById("currentDateDisplay");
@@ -296,24 +304,34 @@ window.saveVotes = async function (voterName) {
       voter_name: voterName,
       score: parseFloat(input.value.replace(",", "."))
     });
-  
+
   }
 
   await supabase.rpc('calculate_round', {
-    p_round_id: currentRoundId,
+    p_round_id: currentRoundId
   });
 
   await loadPlayers();
-  await saveRankingHistory();
 };
 
 async function addPlayer() {
 
   const name = document.getElementById('newPlayerName').value;
-
   if (!name) return;
 
-  await supabase.from('players').insert({ name });
+  const { data: newPlayer } = await supabase
+    .from('players')
+    .insert({ name, rating: 1000 })
+    .select()
+    .single();
+
+  // 🔥 dodaj od razu do ranking_history
+  await supabase.from("ranking_history").insert({
+    player_id: newPlayer.id,
+    round_id: currentRoundId,
+    points: 1000,
+    points_yesterday: 1000
+  });
 
   document.getElementById('newPlayerName').value = '';
 
@@ -442,33 +460,17 @@ document.getElementById("boiskoCounter").innerText =
 
 async function saveRankingHistory() {
 
+  const today = new Date().toISOString().split("T")[0];
+
   for (let p of players) {
 
-    const { data: exists } = await supabase
-      .from("ranking_history")
-      .select("id")
-      .eq("player_id", p.id)
-      .eq("round_id", currentRoundId)
-      .maybeSingle();
-
     await supabase
-  .from("ranking_history")
-  .upsert({
-    player_id: p.id,
-    round_id: currentRoundId,
-    points: p.rating + (p.manual_points || 0),
-    points_yesterday: p.yesterday || p.rating
-  });
-
-    const todayPoints = p.rating;
-    const yesterday = p.yesterday || todayPoints;
-
-    await supabase.from("ranking_history").insert({
-      player_id: p.id,
-      round_id: currentRoundId,
-      points: todayPoints,
-      points_yesterday: yesterday
-    });
+      .from("ranking_history")
+      .upsert({
+        player_id: p.id,
+        date: today,
+        points: p.rating
+      });
 
   }
 }
@@ -527,6 +529,8 @@ async function init() {
   loadBoiskoCounter();
   await loadYesterdayRatings();
   await loadPlayers();
+  await copyYesterdaySnapshot();
+  await saveRankingHistory();
 }
 
 init();

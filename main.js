@@ -475,6 +475,26 @@ async function saveRankingHistory() {
   }
 }
 
+window.recalculateRanking = async function () {
+
+  console.log("Liczenie rankingu...");
+
+  const { error } = await supabase.rpc("calculate_all");
+
+  if (error) {
+    console.error("BŁĄD:", error);
+    alert("Błąd liczenia rankingu");
+    return;
+  }
+
+  // opcjonalnie update players.rating
+  await supabase.rpc("calculate_all"); // tylko jeśli chcesz 2x (albo zrób osobną funkcję SQL)
+
+  await loadPlayers();
+
+  alert("Ranking przeliczony!");
+};
+
 async function init() {
 
   const { data } = await supabase.auth.getUser();

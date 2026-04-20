@@ -312,6 +312,7 @@ window.saveVotes = async function (voterName) {
   });
 
   await loadPlayers();
+  await recalculateRanking();
 };
 
 async function addPlayer() {
@@ -458,23 +459,6 @@ document.getElementById("boiskoCounter").innerText =
 
 }
 
-async function saveRankingHistory() {
-
-  const today = new Date().toISOString().split("T")[0];
-
-  for (let p of players) {
-
-    await supabase
-      .from("ranking_history")
-      .upsert({
-        player_id: p.id,
-        date: today,
-        points: p.rating
-      });
-
-  }
-}
-
 window.recalculateRanking = async function () {
 
   console.log("Liczenie rankingu...");
@@ -487,8 +471,8 @@ window.recalculateRanking = async function () {
     return;
   }
 
-  // opcjonalnie update players.rating
-  await supabase.rpc("calculate_all"); // tylko jeśli chcesz 2x (albo zrób osobną funkcję SQL)
+  // 🔥 DODAJ TO:
+  await supabase.rpc("update_players_rating");
 
   await loadPlayers();
 
@@ -549,7 +533,6 @@ async function init() {
   loadBoiskoCounter();
   await loadYesterdayRatings();
   await loadPlayers();
-  await saveRankingHistory();
 }
 
 init();

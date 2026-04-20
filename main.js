@@ -549,7 +549,6 @@ async function init() {
   loadBoiskoCounter();
   await loadYesterdayRatings();
   await loadPlayers();
-  await copyYesterdaySnapshot();
   await saveRankingHistory();
 }
 

@@ -34,7 +34,7 @@
 
   </div>
   <div class="container">
-    <h1>🏆 Tabela punktów chwały<br>(Możliwe błędy)</h1>
+    <h1>🏆 Tabela punktów chwały</h1>
 
   <div class="center" id="logoutBox" style="display:none;">
     <button onclick="logout()">Wyloguj</button>
@@ -60,16 +60,10 @@
     <div class="card">
       <div class="ranking-header">
         <h2>Ranking</h2>
+
+        <!-- Pusto -->
         
-        <h3>Nie bawić się --></h3>
-        
-        <button onclick="recalculateRanking()">
-          🔄 Policz ranking
-        </button>
-        
-        <!--<a href="simple-ranking.html" class="simple-ranking-btn">>
-          - Nie działa! -
-        </a>-->
+        <!-- Pusto -->
       </div>
       <p id="currentDateDisplay"></p>
       <table id="rankingTable"></table>
@@ -121,6 +115,17 @@
     <!-- PANELE -->
     <div id="panels"></div>
 
+    <div class="card">
+      <h3>🏆 MVP dnia</h3>
+
+      <input type="date" id="mvpDate">
+      <select id="mvpPlayer"></select>
+
+      <button onclick="addMVP()">Dodaj MVP</button>
+
+      <div id="mvpStats"></div>
+    </div>
+
     <!-- DODAJ GRACZA -->
     <div class="card">
       <h2>Dodaj gracza</h2>
@@ -151,6 +156,14 @@
       <span class="close" onclick="closeProfile()">&times;</span>
       <div id="profileContent"></div>
     </div>
+    </div>
+
+    <div id="toast" class="toast hidden">
+      <div class="loader"></div>
+      <span id="toastText">Zapisywanie...</span>
+    </div>
+    <div id="globalLoader" class="loader-overlay hidden">
+      <div class="loader"></div>
     </div>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

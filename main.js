@@ -1,540 +1,421 @@
 document.addEventListener("DOMContentLoaded", async () => {
 
   initAuthUI();
-  
-const supabase = window.supabaseClient;
 
-const savedEmail = localStorage.getItem("savedEmail");
+  const supabase = window.supabaseClient;
 
+  const savedEmail = localStorage.getItem("savedEmail");
   if (savedEmail) {
-    document.getElementById("email").value = savedEmail;
-}
-
-let players = [];
-let currentRoundId = null;
-let yesterdayRatings = {};
-
-const datePicker = document.getElementById('datePicker');
-const rankingTable = document.getElementById('rankingTable');
-const panelsDiv = document.getElementById('panels');
-const loginCard = document.getElementById('loginCard');
-const dateCard = document.getElementById("dateCard");
-
-datePicker.value = new Date().toISOString().split('T')[0];
-
-datePicker.addEventListener('change', () => {
-  updateDateDisplay();
-  init();
-});
-document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
-
-async function ensureRound(date) {
-
-  const { data, error } = await supabase
-    .from('rounds')
-    .select('*')
-    .eq('round_date', date)
-    .maybeSingle();
-
-  if (!data) {
-
-  const { data: newRound, error: insertError } = await supabase
-    .from('rounds')
-    .insert({ round_date: date })
-    .select()
-    .single();
-
-  if(insertError){
-    console.error("INSERT ROUND ERROR:", insertError);
-    return;
+    const emailInput = document.getElementById("email");
+    if (emailInput) emailInput.value = savedEmail;
   }
 
-  currentRoundId = newRound.id;
+  let players = [];
+  let currentRoundId = null;
+  let yesterdayRatings = {};
 
-} else {
+  const datePicker = document.getElementById('datePicker');
+  const rankingTable = document.getElementById('rankingTable');
+  const panelsDiv = document.getElementById('panels');
 
-  currentRoundId = data.id;
+  /* ================= LOADER ================= */
 
+  window.showLoader = function () {
+    const overlay = document.getElementById("globalLoader");
+    const loader = overlay?.querySelector(".loader");
+    if (!overlay || !loader) return;
+
+    loader.classList.remove("success");
+    overlay.classList.remove("hidden");
+
+    setTimeout(() => overlay.classList.add("active"), 10);
+  };
+
+  window.hideLoaderSuccess = function () {
+    const overlay = document.getElementById("globalLoader");
+    const loader = overlay?.querySelector(".loader");
+    if (!overlay || !loader) return;
+
+    loader.classList.add("success");
+
+    setTimeout(() => {
+      overlay.classList.remove("active");
+      overlay.classList.add("hidden");
+      loader.classList.remove("success");
+    }, 1200);
+  };
+
+  /* ================= DATA ================= */
+
+  datePicker.value = new Date().toISOString().split('T')[0];
+
+  datePicker.addEventListener('change', () => {
+    updateDateDisplay();
+    init();
+  });
+
+  document.getElementById('addPlayerBtn')?.addEventListener('click', addPlayer);
+
+  async function ensureRound(date) {
+    const { data } = await supabase
+      .from('rounds')
+      .select('*')
+      .eq('round_date', date)
+      .maybeSingle();
+
+    if (!data) {
+      const { data: newRound } = await supabase
+        .from('rounds')
+        .insert({ round_date: date })
+        .select()
+        .single();
+
+      currentRoundId = newRound.id;
+    } else {
+      currentRoundId = data.id;
+    }
   }
-}
 
-async function loadPlayers() {
+  async function loadPlayers() {
 
-  // 1. players
-  const { data: playersData } = await supabase
-    .from("players")
-    .select("*");
+    const { data: playersData } = await supabase
+      .from("players")
+      .select("*");
 
-  if (!playersData) return;
+    if (!playersData) return;
 
-  // 2. ranking history (jeśli chcesz snapshoty)
-  const { data: history } = await supabase
-    .from("ranking_history")
-    .select("*")
-    .eq("date", new Date().toISOString().split("T")[0]);
+    players = playersData.map(p => ({
+      id: p.id,
+      name: p.name,
+      avatar: p.avatar,
+      rating: p.rating ?? 1000,
+      manual_points: p.manual_points || 0
+    }));
 
-  const historyMap = {};
+    players.sort((a, b) => b.rating - a.rating);
 
-  if (Array.isArray(history)) {
-    history.forEach(h => {
-      historyMap[h.player_id] = h;
+    renderRanking();
+    renderPanels();
+    loadPenaltyPlayers();
+  }
+
+  async function loadYesterdayRatings() {
+    const { data } = await supabase
+      .from("players")
+      .select("id, rating");
+
+    yesterdayRatings = {};
+    data?.forEach(p => {
+      yesterdayRatings[p.id] = p.rating;
     });
   }
 
-  // 3. mapowanie graczy
-  players = playersData.map(p => ({
-    id: p.id,
-    name: p.name,
-    avatar: p.avatar,
-    rating: p.rating
-  }));
+  function updateDateDisplay(){
+    const dateDisplay = document.getElementById("currentDateDisplay");
+    if (!dateDisplay) return;
 
-  // 4. sort
-  players.sort((a, b) => b.rating - a.rating);
+    const date = new Date(datePicker.value);
 
-  // 5. render
-  renderRanking();
-  renderPanels();
-}
-  
-function updateDateDisplay(){
-
-  const dateDisplay = document.getElementById("currentDateDisplay");
-
-  const date = new Date(datePicker.value);
-
-  const formatted =
-    date.toLocaleDateString("pl-PL", {
+    const formatted = date.toLocaleDateString("pl-PL", {
       weekday:"long",
       year:"numeric",
       month:"long",
       day:"numeric"
     });
 
-  dateDisplay.innerHTML = "📅 Runda: <b>" + formatted + "</b>";
+    dateDisplay.innerHTML = "📅 Runda: <b>" + formatted + "</b>";
+  }
 
-}
+  /* ================= RANKING ================= */
 
-async function loadYesterdayRatings() {
+  function renderRanking() {
 
-  const { data } = await supabase
-    .from('players')
-    .select('id,rating');
+    if (!rankingTable) return;
 
-  yesterdayRatings = {};
-
-  data?.forEach(p => {
-    yesterdayRatings[p.id] = p.rating;
-  });
-}
-
-  async function renderRanking() {
-
-  rankingTable.innerHTML = `
-    <tr>
-      <th>#</th>
-      <th>Gracz</th>
-      <th>Punkty</th>
-      <th>Zmiana</th>
-    </tr>
-  `;
-
-  players.forEach((p, i) => {
-
-    let medal = '';
-    if (i === 0) medal = '🥇';
-    if (i === 1) medal = '🥈';
-    if (i === 2) medal = '🥉';
-
-    const diff = Math.round(p.rating - (p.yesterday || p.rating));
-
-    rankingTable.innerHTML += `
-      <tr class="${i === 0 ? 'leader gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
-        <td>${medal || i + 1}</td>
-        <td onclick="goToProfile('${p.id}')">
-          <span class="avatar">${p.avatar || "👤"}</span>
-          ${p.name}
-        </td>
-        <td>${Math.round(p.rating)}</td>
-        <td class="${diff >= 0 ? 'positive' : 'negative'}">
-          ${diff >= 0 ? '+' : ''}${diff}
-        </td>
+    rankingTable.innerHTML = `
+      <tr>
+        <th>#</th>
+        <th>Gracz</th>
+        <th>Punkty</th>
+        <th>Zmiana</th>
       </tr>
     `;
-  });
-}
-  
-window.goToProfile = function(playerId){
-  window.location.href = `profile.html?id=${playerId}`;
-};
 
-  
-async function renderPanels() {
+    players.forEach((p, i) => {
 
-  panelsDiv.innerHTML = '';
+      const prev = yesterdayRatings[p.id] ?? p.rating;
+      const diff = Math.round(p.rating - prev);
 
-  const { data: userData } = await supabase.auth.getUser();
-  const userEmail = userData.user?.email;
+      let medal = '';
+      if (i === 0) medal = '🥇';
+      if (i === 1) medal = '🥈';
+      if (i === 2) medal = '🥉';
 
-  const { data: currentPlayer } = await supabase
-  .from("players")
-  .select("*")
-  .eq("email", userEmail)
-  .single();
+      rankingTable.innerHTML += `
+        <tr class="${i === 0 ? 'leader gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
+          <td>${medal || i + 1}</td>
+          <td onclick="goToProfile('${p.id}')">
+            <span class="avatar">${p.avatar || "👤"}</span>
+            ${p.name}
+          </td>
+          <td>${Math.round(p.rating)}</td>
+          <td class="${diff >= 0 ? 'positive' : 'negative'}">
+            ${diff >= 0 ? '+' : ''}${diff}
+          </td>
+        </tr>
+      `;
+    });
+  }
 
-  const selectedDate = new Date(datePicker.value);
-  const today = new Date();
+  window.goToProfile = function(playerId){
+    window.location.href = `profile.html?id=${playerId}`;
+  };
 
-  selectedDate.setHours(0,0,0,0);
-  today.setHours(0,0,0,0);
+  /* ================= PANELS ================= */
 
-  const threeDaysBefore = new Date(selectedDate);
-  threeDaysBefore.setDate(selectedDate.getDate() - 3);
+  async function renderPanels() {
 
-  let votingAllowed = true;
+    if (!panelsDiv) return;
 
-  if (currentPlayer.role !== "admin") {
+    panelsDiv.innerHTML = '';
 
-    if (today > selectedDate || today < threeDaysBefore) {
-      votingAllowed = false;
+    const { data: userData } = await supabase.auth.getUser();
+    const userEmail = userData?.user?.email;
+
+    if (!userEmail) return;
+
+    const { data: currentPlayer } = await supabase
+      .from("players")
+      .select("*")
+      .eq("email", userEmail)
+      .maybeSingle();
+
+    if (!currentPlayer) return; // 🔥 FIX crasha
+
+    const selectedDate = new Date(datePicker.value);
+    const today = new Date();
+
+    selectedDate.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+
+    const threeDaysBefore = new Date(selectedDate);
+    threeDaysBefore.setDate(selectedDate.getDate() - 3);
+
+    let votingAllowed = true;
+
+    if (currentPlayer.role !== "admin") {
+      if (today > selectedDate || today < threeDaysBefore) {
+        votingAllowed = false;
+      }
     }
 
-  }
+    const voters = currentPlayer.role === "admin"
+      ? players
+      : [currentPlayer];
 
-  let voters = [];
+    voters.forEach((voter) => {
 
-  if (currentPlayer.role === "admin") {
-    voters = players;
-  } else {
-    voters = [currentPlayer];
-  }
+      const card = document.createElement('div');
+      card.className = 'card center';
 
-  voters.forEach((voter) => {
+      let html = `<h3>${voter.name} ocenia:</h3>`;
+      html += `<div class="vote-row-container">`;
 
-    const card = document.createElement('div');
-    card.className = 'card center';
+      players.forEach((player) => {
 
-    let html = `<h3>${voter.name} ocenia:</h3>`;
-    html += `<div class="vote-row-container">`;
+        html += `
+          <div class="vote-row">
+            <div>
+              <span class="avatar">${player.avatar || "👤"}</span>
+              ${player.name}
+            </div>
+            <input 
+              type="number"
+              step="0.1"
+              min="1"
+              max="10"
+              ${!votingAllowed ? "disabled" : ""}
+              id="${voter.id}_${player.id}"
+            />
+          </div>
+        `;
+      });
 
-    players.forEach((player) => {
+      html += `</div>`;
 
       html += `
-        <div class="vote-row">
-          <div>
-          <span class="avatar">${player.avatar || "👤"}</span>
-          ${player.name}
-          </div>
-          <input 
-            type="number"
-            step="0.1"
-            min="1"
-            max="10"
-            ${!votingAllowed ? "disabled" : ""}
-            id="${voter.id}_${player.id}"
-          />
+        <div class="panel-buttons">
+          <button ${!votingAllowed ? "disabled" : ""} onclick="saveVotes('${voter.name}')">
+            Zapisz oceny
+          </button>
+          <button class="absence-btn" onclick="markAbsent('${voter.id}')">
+            Nieobecność
+          </button>
         </div>
       `;
 
+      card.innerHTML = html;
+      panelsDiv.appendChild(card);
+    });
+  }
+
+  /* ================= VOTES ================= */
+
+  window.saveVotes = async function (voterName) {
+
+    showLoader();
+
+    try {
+      const voter = players.find(p => p.name === voterName);
+      if (!voter) return;
+
+      for (let player of players) {
+
+        const input = document.getElementById(`${voter.id}_${player.id}`);
+        if (!input || !input.value) continue;
+
+        await supabase.from('votes').upsert({
+          round_id: currentRoundId,
+          player_id: player.id,
+          voter_name: voterName,
+          score: parseFloat(input.value.replace(",", "."))
+        });
+      }
+
+      await supabase.rpc("calculate_all");
+      await supabase.rpc("update_players_rating");
+
+      await loadPlayers();
+
+      hideLoaderSuccess();
+
+    } catch (e) {
+      console.error(e);
+      alert("Błąd zapisu");
+    }
+  };
+
+  window.markAbsent = async function (playerId) {
+    await supabase.from('absences').insert({
+      player_id: playerId,
+      round_id: currentRoundId,
     });
 
-    html += `</div>`;
+    await loadPlayers();
+  };
 
-    html += `
-      <div class="panel-buttons">
-        <button ${!votingAllowed ? "disabled" : ""} onclick="saveVotes('${voter.name}')">
-          Zapisz oceny
-        </button>
-        <button class="absence-btn"
-        onclick="markAbsent('${voter.id}')">
-        Nieobecność
-        </button>
-      </div>
-    `;
+  /* ================= ADMIN ================= */
 
-    if (!votingAllowed) {
+  async function addPlayer() {
 
-      html += `
-        <p style="margin-top:20px;opacity:0.7;">
-        Głosowanie dostępne tylko od 3 dni przed datą rundy do dnia rundy.
-        </p>
-      `;
+    const name = document.getElementById('newPlayerName').value;
+    if (!name) return;
 
-    }
+    await supabase.from('players').insert({
+      name,
+      rating: 1000
+    });
 
-    card.innerHTML = html;
-    panelsDiv.appendChild(card);
+    document.getElementById('newPlayerName').value = '';
+    await loadPlayers();
+  }
 
-  });
+  function loadPenaltyPlayers(){
 
-}
+    const select = document.getElementById("penaltyPlayer");
+    if (!select) return;
 
-window.markAbsent = async function (playerId) {
+    select.innerHTML = "";
 
-  await supabase.from('absences').insert({
-    player_id: playerId,
-    round_id: currentRoundId,
-  });
+    players.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = p.name;
+      select.appendChild(opt);
+    });
+  }
 
-  const player = players.find((p) => p.id === playerId);
+  window.givePenalty = async function(){
+    const playerId = document.getElementById("penaltyPlayer").value;
+    const points = parseFloat(document.getElementById("penaltyPoints").value);
+    if (!points) return;
 
-  await supabase
-    .from('players')
-    .update({ rating: player.rating })
-    .eq('id', playerId);
+    const player = players.find(p => p.id == playerId);
 
-  await loadPlayers();
-};
+    await supabase
+      .from("players")
+      .update({
+        manual_points:(player.manual_points||0)-points
+      })
+      .eq("id",playerId);
 
-window.saveVotes = async function (voterName) {
+    await loadPlayers();
+  };
 
-  for (let player of players) {
+  window.giveBonus = async function(){
+    const playerId = document.getElementById("penaltyPlayer").value;
+    const points = parseFloat(document.getElementById("bonusPoints").value);
+    if (!points) return;
 
-    const voter = players.find(p => p.name === voterName);
+    const player = players.find(p => p.id == playerId);
 
-    const input = document.getElementById(
-      voter.id + '_' + player.id
+    await supabase
+      .from("players")
+      .update({
+        manual_points:(player.manual_points||0)+points
+      })
+      .eq("id",playerId);
+
+    await loadPlayers();
+  };
+
+  /* ================= BOISKO ================= */
+
+  async function loadBoiskoCounter(){
+
+    const today=new Date().toISOString().split("T")[0];
+
+    const {data}=await supabase
+      .from("field_meetups")
+      .select("status, extra_players")
+      .eq("date", today);
+
+    const playersCount = data?.filter(x => x.status === "yes").length || 0;
+    const extra = (data || []).reduce(
+      (sum, x) => sum + (x.extra_players || 0),
+      0
     );
 
-    if (!input.value) continue;
+    const total = playersCount + extra;
 
-    await supabase.from('votes').upsert({
-      round_id: currentRoundId,
-      player_id: player.id,
-      voter_name: voterName,
-      score: parseFloat(input.value.replace(",", "."))
-    });
-
+    const el = document.getElementById("boiskoCounter");
+    if (el) el.innerText = `Dziś będzie ${total} osób`;
   }
 
-  await supabase.rpc('calculate_round', {
-    p_round_id: currentRoundId
-  });
+  /* ================= INIT ================= */
 
-  await loadPlayers();
-  await recalculateRanking();
-};
+  async function init() {
 
-async function addPlayer() {
+    const { data } = await supabase.auth.getUser();
 
-  const name = document.getElementById('newPlayerName').value;
-  if (!name) return;
+    const panels = document.getElementById("panels");
+    const loginBox = document.getElementById("loginBox");
 
-  const { data: newPlayer } = await supabase
-    .from('players')
-    .insert({ name, rating: 1000 })
-    .select()
-    .single();
-
-  // 🔥 dodaj od razu do ranking_history
-  await supabase.from("ranking_history").insert({
-    player_id: newPlayer.id,
-    round_id: currentRoundId,
-    points: 1000,
-    points_yesterday: 1000
-  });
-
-  document.getElementById('newPlayerName').value = '';
-
-  await loadPlayers();
-}
-
-document.addEventListener("keydown", function(e){
-
-if(e.key === "Enter"){
-
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-
-if(document.activeElement === email || document.activeElement === password){
-
-login();
-
-}
-
-}
-
-});  
-
-function updateNavbarDate(){
-
-const date = new Date(datePicker.value);
-
-const formatted = date.toLocaleDateString("pl-PL", {
-day:"numeric",
-month:"long",
-year:"numeric"
-});
-
-document.getElementById("navbarDate").innerText =
-"📅 " + formatted;
-
-}
-
-function loadPenaltyPlayers(){
-
-const select=document.getElementById("penaltyPlayer");
-
-if(!select) return;
-
-select.innerHTML="";
-
-players.forEach(p=>{
-
-const opt=document.createElement("option");
-
-opt.value=p.id;
-opt.textContent=p.name;
-
-select.appendChild(opt);
-
-});
-
-}
-
-window.givePenalty=async function(){
-
-const playerId=document.getElementById("penaltyPlayer").value;
-const points=parseFloat(document.getElementById("penaltyPoints").value);
-
-if(!points) return;
-
-const player=players.find(p=>p.id==playerId);
-
-await supabase
-.from("players")
-.update({
-manual_points:(player.manual_points||0)-points
-})
-.eq("id",playerId);
-
-document.getElementById("penaltyPoints").value="";
-
-await loadPlayers();
-
-}
-
-window.giveBonus=async function(){
-
-const playerId=document.getElementById("penaltyPlayer").value;
-const points=parseFloat(document.getElementById("bonusPoints").value);
-
-if(!points) return;
-
-const player=players.find(p=>p.id==playerId);
-
-await supabase
-.from("players")
-.update({
-manual_points:(player.manual_points||0)+points
-})
-.eq("id",playerId);
-
-document.getElementById("bonusPoints").value="";
-
-await loadPlayers();
-
-}
-
-
-async function loadBoiskoCounter(){
-
-const today=new Date().toISOString().split("T")[0];
-
-const {data}=await supabase
-.from("field_meetups")
-.select("status, extra_players")
-.eq("date", today);
-
-const playersCount = data.filter(x => x.status === "yes").length;
-const extra = (data || []).reduce(
-  (sum, x) => sum + (x.extra_players || 0),
-  0
-);
-
-const total = playersCount + extra;
-
-document.getElementById("boiskoCounter").innerText =
-`Dziś będzie ${total} osób`;
-
-}
-
-window.recalculateRanking = async function () {
-
-  console.log("Liczenie rankingu...");
-
-  const { error } = await supabase.rpc("calculate_all");
-
-  if (error) {
-    console.error("BŁĄD:", error);
-    alert("Błąd liczenia rankingu");
-    return;
-  }
-
-  // 🔥 DODAJ TO:
-  await supabase.rpc("update_players_rating");
-
-  await loadPlayers();
-
-  alert("Ranking przeliczony!");
-};
-
-async function init() {
-
-  const { data } = await supabase.auth.getUser();
-
-  const addPlayerSection = document.getElementById("newPlayerName").parentElement;
-  const penaltyBox = document.getElementById("adminPenaltyBox");
-  const userBox = document.getElementById("userBox");
-  const userName = document.getElementById("userName");
-  const loginBox = document.getElementById("loginBox");
-  const dateCard = document.getElementById("dateCard");
-
-  if (!data.user) {
-    // Wylogowany użytkownik
-    panelsDiv.style.display = "none";
-    addPlayerSection.style.display = "none";
-    userBox.style.display = "none";
-    loginBox.style.display = "flex";
-    dateCard.style.display = "none";
-    penaltyBox.style.display = "none";  // <-- ukryj panel admina
-  } else {
-    // Zalogowany użytkownik
-    panelsDiv.style.display = "block";
-    userBox.style.display = "flex";
-    loginBox.style.display = "none";
-    dateCard.style.display = "block";
-
-    const { data: player } = await supabase
-      .from('players')
-      .select('*')
-      .eq('email', data.user.email)
-      .single();
-
-    if (player) {
-      userName.innerHTML = `<span class="avatar">${player.avatar || "👤"}</span> ${player.name}`;
-
-      if (player.role === "admin") {
-        addPlayerSection.style.display = "block";
-        penaltyBox.style.display = "block"; // tylko admin widzi panel
-      } else {
-        addPlayerSection.style.display = "none";
-        penaltyBox.style.display = "none"; // player lub inna rola nie widzi panelu
-      }
-    } else {
-      // użytkownik nie ma przypisanego rekordu w tabeli players
-      addPlayerSection.style.display = "none";
-      penaltyBox.style.display = "none";
+    if (!data.user) {
+      if (panels) panels.style.display = "none";
+      if (loginBox) loginBox.style.display = "flex";
+      return;
     }
+
+    if (panels) panels.style.display = "block";
+    if (loginBox) loginBox.style.display = "none";
+
+    await ensureRound(datePicker.value);
+    await loadYesterdayRatings();
+    await loadPlayers();
+    loadBoiskoCounter();
   }
 
-  await ensureRound(datePicker.value);
-  updateNavbarDate();
-  loadBoiskoCounter();
-  await loadYesterdayRatings();
-  await loadPlayers();
-}
-
-init();
+  init();
 
 });

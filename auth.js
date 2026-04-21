@@ -4,6 +4,9 @@ window.supabaseClient = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6YW5xemNqcnBiaG9jcmZjY2l5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE0MzQ4MjUsImV4cCI6MjA4NzAxMDgyNX0.VNer3odvLPJzBbecICFZFw86SXvvCbEZDQNVciEm97k'
 );
 
+function showLoader(){ console.warn("loader not ready"); }
+function hideLoaderSuccess(){}
+
 // 🔐 INIT UI
 window.initAuthUI = async function () {
 
@@ -46,14 +49,13 @@ window.login = async function () {
 
   const supabase = window.supabaseClient;
 
+  showLoader(); // 🔥 START animacji
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
-  const loginBtn = document.getElementById("loginBtn");
   const errorBox = document.getElementById("loginError");
 
   errorBox.innerText = "";
-  loginBtn.innerText = "Logowanie...";
-  loginBtn.classList.add("loading");
 
   try {
     const { error } = await supabase.auth.signInWithPassword({
@@ -62,19 +64,23 @@ window.login = async function () {
     });
 
     if (error) {
+      hideLoaderSuccess();
       errorBox.innerText = "❌ Nieprawidłowy email lub hasło";
       return;
     }
 
     localStorage.setItem("savedEmail", email);
-    location.reload();
+
+    hideLoaderSuccess();
+
+    setTimeout(() => {
+      location.reload();
+    }, 800);
 
   } catch (err) {
     console.error(err);
+    hideLoaderSuccess();
     errorBox.innerText = "❌ Błąd logowania";
-  } finally {
-    loginBtn.innerText = "Zaloguj";
-    loginBtn.classList.remove("loading");
   }
 };
 
@@ -85,6 +91,9 @@ window.logout = async function () {
   location.reload();
 };
 
+
+
+
 // ENTER = login
 document.addEventListener("keydown", function(e){
   if(e.key === "Enter"){
@@ -92,7 +101,7 @@ document.addEventListener("keydown", function(e){
     const password = document.getElementById("password");
 
     if(document.activeElement === email || document.activeElement === password){
-      login();
+      window.login();
     }
   }
 });

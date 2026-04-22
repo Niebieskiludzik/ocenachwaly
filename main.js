@@ -383,7 +383,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     await supabase.from('players').insert({
       name,
       rating: 1000,
-      role: "user"
+      role: "player"
     });
 
     document.getElementById('newPlayerName').value = '';
@@ -420,7 +420,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const panels = document.getElementById("panels");
   const dateCard = document.getElementById("dateCard");
 
-  const addPlayerBox = document.getElementById("addPlayerBox");
+  const addPlayerBox = document.getElementById("newPlayerName")?.parentElement;
   const penaltyBox = document.getElementById("adminPenaltyBox");
   const mvpBox = document.getElementById("mvpBox");
   const boiskoBox = document.getElementById("boiskoBox");
@@ -436,6 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 🔥 GUEST
   if (currentRole === "guest") {
     if (panels) panels.style.display = "none";
+    if (dateCard) dateCard.style.display = "none";
     if (addPlayerBox) addPlayerBox.style.display = "none";
     if (penaltyBox) penaltyBox.style.display = "none";
     if (mvpBox) mvpBox.style.display = "none";
@@ -450,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
-  // 🔥 ADMIN → nic nie ukrywamy
+  // ADMIN → wszystko widzi
 }
 
   function loadPenaltyPlayers() {

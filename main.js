@@ -191,6 +191,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (i === 1) medal = '🥈';
       if (i === 2) medal = '🥉';
 
+      let diffClass = "";
+      let diffText = diff;
+
+      if (diff > 0) {
+        diffClass = "positive";
+        diffText = "+" + diff;
+      } else if (diff < 0) {
+        diffClass = "negative";
+        diffText = diff;
+      } else {
+        diffClass = "";
+        diffText = "0";
+      }
+
       rankingTable.innerHTML += `
         <tr class="${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
           <td>${medal || i + 1}</td>
@@ -199,8 +213,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             ${p.name}
           </td>
           <td>${Math.round(p.rating)}</td>
-          <td class="${diff >= 0 ? 'positive' : 'negative'}">
-            ${diff >= 0 ? '+' : ''}${diff}
+          <td class="${diffClass}">
+            ${diffText}
           </td>
         </tr>
       `;

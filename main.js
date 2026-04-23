@@ -115,16 +115,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadYesterdayRatings() {
 
-    const { data } = await supabase
-      .from("players")
-      .select("id, rating");
+  const selectedDate = new Date(datePicker.value);
 
-    yesterdayRatings = {};
+  const yesterday = new Date(selectedDate);
+  yesterday.setDate(selectedDate.getDate() - 1);
 
-    data?.forEach(p => {
-      yesterdayRatings[p.id] = p.rating;
-    });
-  }
+  const yesterdayStr = yesterday.toISOString().split("T")[0];
+
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("id")
+    .eq("round_date", yesterdayStr)
+    .maybeSingle();
+
+  yesterdayRatings = {};
+
+  if (!round) return;
+
+  const { data: history, error } = await supabase
+    .from("ranking_history")
+    .select("player_id, points")
+    .eq("round_id", round.id);
+
+    if (error) {
+      console.error("HISTORY ERROR:", error);
+    }
+
+  history?.forEach(row => {
+  yesterdayRatings[String(row.player_id)] = row.points;
+});
+}
 
   /* ================= UI ================= */
 
@@ -163,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     players.forEach((p, i) => {
 
-      const prev = yesterdayRatings[p.id] ?? p.rating;
+      const prev = yesterdayRatings[String(p.id)] ?? p.rating;
       const diff = Math.round(p.rating - prev);
 
       let medal = '';
@@ -189,6 +209,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   window.goToProfile = function(id){
     window.location.href = `profile.html?id=${id}`;
+       
+    
+        console.log("PLAYER ID:", p.id);
+        console.log("YESTERDAY:", yesterdayRatings[p.id]);
+        console.log("MAP:", yesterdayRatings);
   };
 
   /* ================= ROLE FIX ================= */

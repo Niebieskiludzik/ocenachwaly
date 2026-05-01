@@ -170,66 +170,65 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderRanking() {
 
-    if (!rankingTable) return;
+  if (!rankingTable) return;
 
-    rankingTable.innerHTML = `
-      <tr>
-        <th>#</th>
-        <th>Gracz</th>
-        <th>Punkty</th>
-        <th>Zmiana</th>
+  rankingTable.innerHTML = `
+    <tr>
+      <th>#</th>
+      <th>Gracz</th>
+      <th>Punkty</th>
+      <th>Zmiana</th>
+    </tr>
+  `;
+
+  players.forEach((p, i) => {
+
+    const prev = yesterdayRatings[p.id] ?? p.rating;
+    const diff = Math.round(p.rating - prev);
+
+    let diffDisplay = "-";
+    let diffClass = "";
+
+    if (diff > 0) {
+      diffDisplay = `↑ ${diff}`;
+      diffClass = "positive";
+    }
+
+    if (diff < 0) {
+      diffDisplay = `↓ ${Math.abs(diff)}`;
+      diffClass = "negative";
+    }
+
+    let medal = "";
+
+    if (i === 0) medal = "🥇";
+    if (i === 1) medal = "🥈";
+    if (i === 2) medal = "🥉";
+
+    rankingTable.innerHTML += `
+      <tr class="${
+        i === 0 ? "gold" :
+        i === 1 ? "silver" :
+        i === 2 ? "bronze" : ""
+      }">
+        <td>${medal || i + 1}</td>
+        <td onclick="goToProfile('${p.id}')">
+          <span class="avatar">${p.avatar || "👤"}</span>
+          ${p.name}
+        </td>
+        <td>${Math.round(p.rating)}</td>
+        <td class="${diffClass}">
+          ${diffDisplay}
+        </td>
       </tr>
     `;
+  });
+}
 
-    players.forEach((p, i) => {
-
-      const prev = yesterdayRatings[String(p.id)] ?? p.rating;
-      const diff = Math.round(p.rating - prev);
-
-      let medal = '';
-      if (i === 0) medal = '🥇';
-      if (i === 1) medal = '🥈';
-      if (i === 2) medal = '🥉';
-
-      let diffClass = "";
-      let diffText = diff;
-
-      if (diff > 0) {
-        diffClass = "positive";
-        diffText = "+" + diff;
-      } else if (diff < 0) {
-        diffClass = "negative";
-        diffText = diff;
-      } else {
-        diffClass = "";
-        diffText = "0";
-      }
-
-      rankingTable.innerHTML += `
-        <tr class="${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
-          <td>${medal || i + 1}</td>
-          <td onclick="goToProfile('${p.id}')">
-            <span class="avatar">${p.avatar || "👤"}</span>
-            ${p.name}
-          </td>
-          <td>${Math.round(p.rating)}</td>
-          <td class="${diffClass}">
-            ${diffText}
-          </td>
-        </tr>
-      `;
-    });
-  }
-
-  window.goToProfile = function(id){
-    window.location.href = `profile.html?id=${id}`;
-       
+window.goToProfile = function(id) {
+  window.location.href = `profile.html?id=${id}`;
+};
     
-        console.log("PLAYER ID:", p.id);
-        console.log("YESTERDAY:", yesterdayRatings[p.id]);
-        console.log("MAP:", yesterdayRatings);
-  };
-
   /* ================= ROLE FIX ================= */
 
   function getCurrentPlayer(userEmail) {
@@ -261,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       `;
       return;
     }
-
+  
     const role = currentPlayer.role || "user";
 
     const selectedDate = new Date(datePicker.value);
@@ -325,6 +324,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  /* ================= MVP ================= */
+
+  
+  async function calculateAndSaveMVP() {
+
+  let bestPlayer = null;
+  let bestGain = -999999;
+
+  players.forEach(player => {
+    const oldRating = yesterdayRatings[player.id] ?? player.rating;
+    const gain = Math.round(player.rating - oldRating);
+
+    if (gain > bestGain) {
+      bestGain = gain;
+      bestPlayer = player;
+    }
+  });
+
+  if (!bestPlayer) return;
+
+  // usuń stare MVP tej rundy (żeby nie duplikować)
+  await supabase
+    .from("mvp_history")
+    .delete()
+    .eq("round_id", currentRoundId);
+
+  // zapisz nowe MVP
+  await supabase
+    .from("mvp_history")
+    .insert({
+      round_id: currentRoundId,
+      player_id: bestPlayer.id,
+      points_gain: bestGain
+    });
+}
+
   /* ================= SAVE ================= */
 
   window.saveVotes = async function (voterName) {
@@ -356,6 +391,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       await supabase.rpc("update_players_rating");
 
       await loadPlayers();
+      await calculateAndSaveMVP();
 
       hideLoaderSuccess();
 
@@ -507,6 +543,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.appendChild(opt);
   });
 }
+
+  /* ================= Ostatni MVP ================= */
+
+  async function loadLastMVP() {
+  const box = document.getElementById("lastMVP");
+  if (!box) return;
+
+  const { data, error } = await supabase
+    .from("mvp_history")
+    .select(`
+      gain,
+      player_id,
+      round_id,
+      players(name, avatar),
+      rounds(round_date)
+    `)
+    .gt("gain", 0)
+    .order("round_id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    box.innerHTML = "🏆 Ostatni MVP: brak";
+    return;
+  }
+
+  box.innerHTML = `
+    🏆 Ostatni MVP:
+    ${data.players?.avatar || "👤"}
+    ${data.players?.name || "Nieznany"}
+    (+${Math.round(data.gain)})
+  `;
+}
+  
   /* ================= INIT ================= */
 
 async function init() {
@@ -527,6 +597,7 @@ async function init() {
   await ensureRound(datePicker.value);
   await loadYesterdayRatings();
   await loadPlayers();
+  await loadLastMVP();
 
   applyPermissions();
   updateDateDisplay();

@@ -1,15 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <title>Profil gracza</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Ranking miesięczny</title>
+
+  <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
 
 <body>
 
-<!-- NAVBAR (skopiowany 1:1) -->
+
+
+  <!-- NAVBAR (skopiowany 1:1) -->
 <div class="navbar">
 
   <div class="nav-left">
@@ -38,21 +41,29 @@
 
 </div>
 
-<div class="container">
 
-  <!--<a href="index.html" class="backButton">
-    ⬅ Powrót do rankingu
-  </a>-->
+  
+  <div class="container">
+ 
+    <h1>🏆 Ranking miesięczny</h1>
+    
+    <!--<a href="index.html" class="backButton">
+      ⬅ Powrót do rankingu
+    </a>-->
+    
+    <div class="ranking-header">
+      <input type="month" id="monthPicker">
+    </div>
+    
+    <div id="rankingList">Ładowanie...</div>
 
-  <div id="profileCard" class="card center">
-    Ładowanie...
   </div>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="auth.js"></script>
-<script src="profile.js"></script>
-
+  
+  <link rel="stylesheet" href="style.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="auth.js"></script>
+  <script src="ranking.js"></script>
+  
 </body>
 </html>

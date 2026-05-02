@@ -157,14 +157,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     <div class="profile-highlight">
       📅 Przez ostatnie 30 dni zdobył <b>${last30.toFixed(1).replace(".", ",")}</b> punktów
     </div>
+    
     <div class="profile-average">
-      🗳 Średnia ocen: <span id="avg-rating">${avgRating}</span> <span class="divider">|</span> <span id="avg-count">${ratingCount}</span> ocen
+      🗳 Średnia ocen: <b id="avg-rating">${avgRating}</b> <span class="divider">|</span> <span id="avg-count">${ratingCount}</span> ocen
     </div>
+    
     <div class="profile-box">
       🗳 Oddane głosy średnia: <b>${givenAvg.toFixed(2).replace(".", ",")}</b>
       <span class="divider">|</span>
       ${givenCount} ocen
     </div>
+    
     <div class="profile-box">
       🎯 Oddane głosy na siebie: <b>${selfAvg.toFixed(2).replace(".", ",")}</b>
       <span class="divider">|</span>
@@ -202,14 +205,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     <div class="profile-section-title">
       <a href="achievements.html?id=${playerId}" class="achievements-btn">
-        🏅 Osiągnięcia: <span id="achievements-count">0/0</span>
+        🏅 Osiągnięcia: <span id="achievements-count"></span>
+        
       </a>
     </div>
     <div id="achievements-list" class="achievements-list">
       <!-- Odznaki będą dodawane przez JS -->
     </div>
   `;
-
+//0/0 <--- było w przycisku do achievements
   // 🔹 Funkcja średniej ocen (ostatnie 30 dni)
   async function loadAverageRating(playerId) {
     const { data: votes } = await supabase

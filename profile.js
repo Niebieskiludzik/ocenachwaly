@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     <div class="profile-section-title">
       <a href="achievements.html?id=${playerId}" class="achievements-btn">
-        🏅 Osiągnięcia: <span id="achievements-count"></span>
+        🏅 Osiągnięcia <span id="achievements-count"></span>
         
       </a>
     </div>

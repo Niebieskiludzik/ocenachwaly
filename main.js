@@ -216,7 +216,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           <span class="avatar">${p.avatar || "👤"}</span>
           ${p.name}
         </td>
-        <td>${Math.round(p.rating)}</td>
+        <td>${Math.round((p.rating || 0) + (p.manual_points || 0))}</td>
         <td class="${diffClass}">
           ${diffDisplay}
         </td>
@@ -424,6 +424,62 @@ window.goToProfile = function(id) {
     select.appendChild(opt);
   });
 }
+
+//---------------------------//
+  
+window.givePenalty = async function () {
+
+  if (currentRole !== "admin") return;
+
+  const playerId = document.getElementById("penaltyPlayer")?.value;
+  const points = parseFloat(
+    document.getElementById("penaltyPoints")?.value
+  );
+
+  if (!playerId || !points) return;
+
+  const player = players.find(p => String(p.id) === String(playerId));
+  if (!player) return;
+
+  await supabase
+    .from("players")
+    .update({
+      manual_points: (player.manual_points || 0) - points
+    })
+    .eq("id", playerId);
+
+  document.getElementById("penaltyPoints").value = "";
+
+  await loadPlayers();
+};
+
+window.giveBonus = async function () {
+
+  if (currentRole !== "admin") return;
+
+  const playerId = document.getElementById("penaltyPlayer")?.value;
+  const points = parseFloat(
+    document.getElementById("bonusPoints")?.value
+  );
+
+  if (!playerId || !points) return;
+
+  const player = players.find(p => String(p.id) === String(playerId));
+  if (!player) return;
+
+  await supabase
+    .from("players")
+    .update({
+      manual_points: (player.manual_points || 0) + points
+    })
+    .eq("id", playerId);
+
+  document.getElementById("bonusPoints").value = "";
+
+  await loadPlayers();
+};
+
+  //----------------------//
 
   async function loadBoiskoCounter(){
 

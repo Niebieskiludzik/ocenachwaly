@@ -24,7 +24,7 @@
 }
 
 /* Profil */
-.profile-box, .profile-average {
+/*.profile-box, .profile-average {
   background-color: #f5f5f5;
   border-radius: 12px;
   padding: 10px 15px;
@@ -42,7 +42,7 @@
 .profile-average .divider {
   margin: 0 5px;
   color: #999;
-}
+}*/
 
 /* Odznaki */
 .achievements-list {

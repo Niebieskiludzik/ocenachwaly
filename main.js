@@ -269,13 +269,13 @@ window.goToProfile = function(id) {
     selectedDate.setHours(0,0,0,0);
     today.setHours(0,0,0,0);
 
-    const threeDaysBefore = new Date(selectedDate);
-    threeDaysBefore.setDate(selectedDate.getDate() - 3);
+    const threeDaysAfter = new Date(selectedDate);
+    threeDaysAfter.setDate(selectedDate.getDate() + 3);
 
     let votingAllowed = role === "admin"
       ? true
-      : !(today > selectedDate || today < threeDaysBefore);
-
+      : !(today < selectedDate || today > threeDaysAfter);
+    
     const voters = role === "admin"
       ? players
       : [currentPlayer];
@@ -324,42 +324,40 @@ window.goToProfile = function(id) {
     });
   }
 
-  /* ================= MVP ================= */
-
+/*------------------MVP-------------------*/
   
-  async function calculateAndSaveMVP() {
+async function calculateAndSaveMVP() {
+  if (!currentRoundId) return;
 
-  let bestPlayer = null;
-  let bestGain = -999999;
+  const { data: history, error } = await supabase
+    .from("ranking_history")
+    .select("player_id, points")
+    .eq("round_id", currentRoundId)
+    .gt("points", 0)
+    .order("points", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
-  players.forEach(player => {
-    const oldRating = yesterdayRatings[player.id] ?? player.rating;
-    const gain = Math.round(player.rating - oldRating);
+  if (error || !history) {
+    console.error("MVP SAVE ERROR:", error);
+    return;
+  }
 
-    if (gain > bestGain) {
-      bestGain = gain;
-      bestPlayer = player;
-    }
-  });
-
-  if (!bestPlayer) return;
-
-  // usuń stare MVP tej rundy (żeby nie duplikować)
   await supabase
     .from("mvp_history")
     .delete()
     .eq("round_id", currentRoundId);
 
-  // zapisz nowe MVP
   await supabase
     .from("mvp_history")
     .insert({
       round_id: currentRoundId,
-      player_id: bestPlayer.id,
-      points_gain: bestGain
+      player_id: history.player_id,
+      points_gain: history.points
     });
 }
 
+  
   /* ================= SAVE ================= */
 
   window.saveVotes = async function (voterName) {
@@ -389,9 +387,11 @@ window.goToProfile = function(id) {
 
       await supabase.rpc("calculate_all");
       await supabase.rpc("update_players_rating");
+      await supabase.rpc("calculate_daily_mvp");
 
       await loadPlayers();
       await calculateAndSaveMVP();
+      await loadLastMVP();
 
       hideLoaderSuccess();
 
@@ -609,18 +609,24 @@ window.giveBonus = async function () {
   const { data, error } = await supabase
     .from("mvp_history")
     .select(`
-      gain,
+      points_gain,
       player_id,
       round_id,
       players(name, avatar),
       rounds(round_date)
     `)
-    .gt("gain", 0)
-    .order("round_id", { ascending: false })
+    .gt("points_gain", 0)
+    .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (error || !data) {
+  if (error) {
+    console.error("MVP ERROR:", error);
+    box.innerHTML = "🏆 Ostatni MVP: błąd";
+    return;
+  }
+
+  if (!data) {
     box.innerHTML = "🏆 Ostatni MVP: brak";
     return;
   }
@@ -629,7 +635,7 @@ window.giveBonus = async function () {
     🏆 Ostatni MVP:
     ${data.players?.avatar || "👤"}
     ${data.players?.name || "Nieznany"}
-    (+${Math.round(data.gain)})
+    (+${Math.round(data.points_gain)})
   `;
 }
   

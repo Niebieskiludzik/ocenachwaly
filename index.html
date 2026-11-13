@@ -4,19 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tabela punktów chwały</title>
-  <!-- Zachowujemy Twój plik style.css dla stylów tabeli z main.js -->
+  <!-- Zewnętrzny plik ze stylami tabeli -->
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-dark: #070510;
+      --bg-dark: #05020a;
       --primary-purple: #7E42C4;
       --neon-purple: #a855f7;
       --accent-gold: #FFD700;
-      --glass-bg: rgba(18, 12, 36, 0.65);
-      --glass-border: rgba(168, 85, 247, 0.25);
     }
 
     * {
@@ -27,36 +25,33 @@
 
     body {
       background-color: var(--bg-dark);
-      color: #f3f0ff;
+      color: #ffffff;
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
       overflow-x: hidden;
       position: relative;
-      /* Futurystyczne tło z trójkątami i liniami w odcieniach fioletu */
+      /* Futurystyczne tło z trójkątami i liniami */
       background-image: 
-        radial-gradient(circle at 50% 35%, rgba(126, 66, 196, 0.22) 0%, transparent 60%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cg fill='none' stroke-width='1.5'%3E%3Cpolygon points='120,80 340,40 220,280' fill='%232e1065' fill-opacity='0.25' stroke='%236b21a8' stroke-opacity='0.4'/%3E%3Cpolygon points='1150,120 1380,220 1210,410' fill='%234c1d95' fill-opacity='0.2' stroke='%237e22ce' stroke-opacity='0.35'/%3E%3Cpolygon points='80,620 290,540 240,820' fill='%233b0764' fill-opacity='0.3' stroke='%239333ea' stroke-opacity='0.3'/%3E%3Cpolygon points='1080,680 1320,610 1260,860' fill='%23581c87' fill-opacity='0.2' stroke='%23a855f7' stroke-opacity='0.35'/%3E%3Cpolygon points='680,110 760,210 610,230' fill='%234c1d95' fill-opacity='0.15' stroke='%237e22ce' stroke-opacity='0.25'/%3E%3Cline x1='0' y1='180' x2='520' y2='450' stroke='%236b21a8' stroke-opacity='0.25'/%3E%3Cline x1='1440' y1='140' x2='890' y2='520' stroke='%237e22ce' stroke-opacity='0.25'/%3E%3Cline x1='340' y1='40' x2='680' y2='110' stroke='%239333ea' stroke-opacity='0.2'/%3E%3Cline x1='220' y1='280' x2='290' y2='540' stroke='%23581c87' stroke-opacity='0.3'/%3E%3Cline x1='1210' y1='410' x2='1080' y2='680' stroke='%237e22ce' stroke-opacity='0.3'/%3E%3Cline x1='0' y1='750' x2='1440' y2='650' stroke='%234c1d95' stroke-opacity='0.2'/%3E%3Ccircle cx='340' cy='40' r='3' fill='%23a855f7' fill-opacity='0.6'/%3E%3Ccircle cx='220' cy='280' r='4' fill='%239333ea' fill-opacity='0.5'/%3E%3Ccircle cx='1210' cy='410' r='3' fill='%23c084fc' fill-opacity='0.6'/%3E%3Ccircle cx='290' cy='540' r='3' fill='%23a855f7' fill-opacity='0.5'/%3E%3C/g%3E%3C/svg%3E");
+        radial-gradient(circle at 50% 20%, rgba(126, 66, 196, 0.3) 0%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cg fill='none' stroke-width='1.5'%3E%3Cpolygon points='120,80 340,40 220,280' fill='%232e1065' fill-opacity='0.4' stroke='%236b21a8' stroke-opacity='0.6'/%3E%3Cpolygon points='1150,120 1380,220 1210,410' fill='%234c1d95' fill-opacity='0.35' stroke='%237e22ce' stroke-opacity='0.5'/%3E%3Cpolygon points='80,620 290,540 240,820' fill='%233b0764' fill-opacity='0.45' stroke='%239333ea' stroke-opacity='0.5'/%3E%3Cpolygon points='1080,680 1320,610 1260,860' fill='%23581c87' fill-opacity='0.35' stroke='%23a855f7' stroke-opacity='0.5'/%3E%3Cline x1='0' y1='180' x2='520' y2='450' stroke='%236b21a8' stroke-opacity='0.4'/%3E%3Cline x1='1440' y1='140' x2='890' y2='520' stroke='%237e22ce' stroke-opacity='0.4'/%3E%3Ccircle cx='340' cy='40' r='4' fill='%23a855f7' fill-opacity='0.8'/%3E%3Ccircle cx='1210' cy='410' r='4' fill='%23c084fc' fill-opacity='0.8'/%3E%3C/g%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
     }
 
-    /* Pasek nawigacji */
+    /* Pasek nawigacji – pełna widoczność */
     .navbar {
+      position: relative;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 15px;
       padding: 16px 32px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--glass-border);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-      z-index: 10;
+      background: #100824; /* Stabilne ciemne tło */
+      border-bottom: 2px solid #9333ea;
+      box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
+      z-index: 100;
     }
 
     .nav-left {
@@ -66,14 +61,12 @@
       letter-spacing: 1px;
       text-transform: uppercase;
       color: #fff;
-      text-shadow: 0 0 12px rgba(168, 85, 247, 0.7);
     }
 
     .nav-center {
       font-family: 'Rajdhani', sans-serif;
       font-size: 18px;
       color: #d8b4fe;
-      letter-spacing: 1.5px;
     }
 
     .nav-right {
@@ -90,35 +83,33 @@
     }
 
     .navbar input {
-      background: rgba(10, 6, 24, 0.8);
-      border: 1px solid rgba(168, 85, 247, 0.4);
+      background: #05020a;
+      border: 1px solid #9333ea;
       color: #fff;
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
     .navbar input:focus {
-      border-color: var(--neon-purple);
-      box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+      border-color: var(--accent-gold);
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
     }
 
     .navbar button, #logoutBox button {
-      background: linear-gradient(135deg, #6b21a8, #9333ea);
+      background: linear-gradient(135deg, #7e22ce, #a855f7);
       color: white;
-      border: 1px solid rgba(216, 180, 254, 0.3);
+      border: 1px solid #d8b4fe;
       padding: 8px 16px;
       border-radius: 6px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
 
-    .navbar button:hover, #logoutBox button:hover {
-      background: linear-gradient(135deg, #7e22ce, #a855f7);
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
+    .navbar button:hover {
+      background: linear-gradient(135deg, #9333ea, #c084fc);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
     }
 
     #loginError {
@@ -126,56 +117,180 @@
       font-size: 13px;
     }
 
-    /* Sekcja główna z wyśrodkowanym przyciskiem pobierania */
+    /* Główna sekcja z przyciskiem pobierania */
     .hero-download {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 50px 20px 30px;
+      padding: 40px 20px;
       text-align: center;
+      z-index: 10;
     }
 
+    /* Wyśrodkowany, wyraźny przycisk */
     .download-btn {
       position: relative;
       display: inline-flex;
       align-items: center;
       gap: 18px;
-      padding: 20px 38px;
-      background: linear-gradient(135deg, rgba(88, 28, 135, 0.85) 0%, rgba(126, 66, 196, 0.9) 100%);
+      padding: 22px 40px;
+      background: linear-gradient(135deg, #581c87 0%, #7e22ce 100%);
       color: #ffffff;
       text-decoration: none;
       border-radius: 16px;
-      border: 2px solid var(--accent-gold);
+      border: 3px solid var(--accent-gold);
       box-shadow: 
-        0 0 25px rgba(126, 66, 196, 0.6),
-        0 0 12px rgba(255, 215, 0, 0.25),
-        inset 0 0 15px rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(8px);
-      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-      overflow: hidden;
-    }
-
-    /* Efekt świetlnego błysku przelatującego przez przycisk */
-    .download-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 60%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-      transform: skewX(-25deg);
-      transition: left 0.6s ease;
-    }
-
-    .download-btn:hover::before {
-      left: 150%;
+        0 0 30px rgba(126, 66, 196, 0.8),
+        0 0 15px rgba(255, 215, 0, 0.5);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
     .download-btn:hover {
-      transform: translateY(-4px) scale(1.02);
+      transform: translateY(-4px) scale(1.03);
       box-shadow: 
-        0 10px 35px rgba(168, 85, 247, 0.8),
-        0 0 20px rgba(255, 215, 0, 0.5);
+        0 10px 40px rgba(168, 85, 247, 1),
+        0 0 25px rgba(255, 215, 0, 0.8);
     }
+
+    .btn-icon {
+      font-size: 42px;
+      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+    }
+
+    .btn-text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+
+    .btn-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+      text-transform: uppercase;
+    }
+
+    .btn-sub {
+      font-size: 14px;
+      color: #e9d5ff;
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .version-badge {
+      background: var(--accent-gold);
+      color: #05020a;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Kontener tabeli */
+    .container {
+      position: relative;
+      width: 92%;
+      max-width: 1100px;
+      margin: 20px auto 60px;
+      padding: 30px;
+      background: #100824; /* Stabilne ciemne tło */
+      border: 2px solid #9333ea;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+      z-index: 10;
+    }
+
+    .container h1 {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 32px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-align: center;
+      margin-bottom: 24px;
+      color: #fff;
+    }
+
+    .center {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(5, 2, 10, 0.85);
+    }
+
+    .modal-content {
+      background: #140c28;
+      border: 2px solid var(--neon-purple);
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+      margin: 10% auto;
+      padding: 25px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      color: #fff;
+      position: relative;
+    }
+
+    .close {
+      color: #d8b4fe;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: var(--accent-gold);
+    }
+
+    @media (max-width: 650px) {
+      .navbar {
+        justify-content: center;
+        text-align: center;
+      }
+      .download-btn {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px 24px;
+      }
+      .btn-text {
+        align-items: center;
+        text-align: center;
+      }
+      .btn-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pasek nawigacji -->
+  <div class="navbar">
+    <div class="nav-left">
+      🏆 Ranking Chwały
+    </div>
+
+    <div class="nav-center">
+      <span id="navbarDate"></span>
+    </div>
+
+    <div class="nav-right">
+      <div id="loginBox">
+        <input id="email" placeholder="email">
+        <input id="password" type

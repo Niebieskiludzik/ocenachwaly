@@ -249,20 +249,20 @@
       color: var(--accent-gold);
     }
 
-    /* Responsywność dla małych ekranów telefonów (układ dwurzędowy navbara) */
+    /* Responsywność dla małych ekranów telefonów (pomniejszenie przycisku burgera 2x i listy 3x) */
     @media (max-width: 650px) {
       .navbar {
         flex-direction: column;
         align-items: center;
-        padding: 10px 12px;
-        gap: 8px;
+        padding: 8px 10px;
+        gap: 6px;
         text-align: center;
       }
       .nav-left {
-        font-size: 18px;
+        font-size: 16px;
       }
       .nav-center {
-        font-size: 13px;
+        font-size: 12px;
       }
       .nav-right {
         width: 100%;
@@ -271,23 +271,35 @@
       #loginBox {
         width: 100%;
         justify-content: center;
-        gap: 6px;
+        gap: 4px;
+      }
+      /* Przycisk hamburgera / menu zwijanego (zmniejszony o połowę / 2x) */
+      .hamburger, .menu-toggle, .burger {
+        transform: scale(0.5);
+        padding: 2px 4px;
+        font-size: 10px;
+      }
+      /* Lista rozwijana / menu (zmniejszona o ok. 3x) */
+      .dropdown-content, .nav-menu, .menu, .dropdown {
+        transform: scale(0.33);
+        transform-origin: top right;
+        font-size: 9px;
       }
       .navbar input {
         flex: 1;
-        min-width: 100px;
-        max-width: 130px;
-        padding: 6px 8px;
-        font-size: 12px;
+        min-width: 90px;
+        max-width: 110px;
+        padding: 4px 6px;
+        font-size: 11px;
       }
       .navbar button, #logoutBox button {
-        padding: 6px 12px;
-        font-size: 12px;
+        padding: 4px 8px;
+        font-size: 11px;
       }
       .download-btn {
         flex-direction: column;
         text-align: center;
-        padding: 18px 22px;
+        padding: 16px 20px;
         gap: 12px;
         width: 95%;
         max-width: 340px;

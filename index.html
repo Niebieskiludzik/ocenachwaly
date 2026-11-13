@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tabela punktów chwały</title>
-  <!-- Zewnętrzny plik ze stylami tabeli -->
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" type="image/png" href="favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -28,6 +27,8 @@
       color: #ffffff;
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       overflow-x: hidden;
       position: relative;
       /* Futurystyczne tło z trójkątami i liniami */
@@ -39,7 +40,7 @@
       background-attachment: fixed;
     }
 
-    /* Pasek nawigacji – pełna widoczność */
+    /* Pasek nawigacji */
     .navbar {
       position: relative;
       display: flex;
@@ -47,8 +48,8 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 15px;
-      padding: 16px 32px;
-      background: #100824; /* Stabilne ciemne tło */
+      padding: 14px 24px;
+      background: #100824;
       border-bottom: 2px solid #9333ea;
       box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
       z-index: 100;
@@ -56,7 +57,7 @@
 
     .nav-left {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -65,7 +66,7 @@
 
     .nav-center {
       font-family: 'Rajdhani', sans-serif;
-      font-size: 18px;
+      font-size: 16px;
       color: #d8b4fe;
     }
 
@@ -78,7 +79,7 @@
     #loginBox {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
     }
 
@@ -86,45 +87,48 @@
       background: #05020a;
       border: 1px solid #9333ea;
       color: #fff;
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
+      width: 130px;
     }
 
     .navbar input:focus {
       border-color: var(--accent-gold);
-      box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
     }
 
     .navbar button, #logoutBox button {
       background: linear-gradient(135deg, #7e22ce, #a855f7);
       color: white;
       border: 1px solid #d8b4fe;
-      padding: 8px 16px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-weight: 600;
+      font-size: 13px;
       cursor: pointer;
     }
 
     .navbar button:hover {
       background: linear-gradient(135deg, #9333ea, #c084fc);
-      box-shadow: 0 0 15px rgba(168, 85, 247, 0.8);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
     }
 
     #loginError {
       color: #f87171;
-      font-size: 13px;
+      font-size: 12px;
     }
 
-    /* Główna sekcja z przyciskiem pobierania */
+    /* Główna sekcja z przyciskiem pobierania – rozciągnięta na całą dostępną wysokość, aby idealnie wyśrodkować przycisk */
     .hero-download {
+      flex: 1;
       position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 20px;
+      padding: 20px;
       text-align: center;
       z-index: 10;
     }
@@ -192,33 +196,19 @@
       font-size: 12px;
     }
 
-    /* Kontener tabeli */
+    /* Kontener (opcjonalny dla elementów logowania/tabeli w tle) */
     .container {
       position: relative;
       width: 92%;
       max-width: 1100px;
-      margin: 20px auto 60px;
-      padding: 30px;
-      background: #100824; /* Stabilne ciemne tło */
-      border: 2px solid #9333ea;
-      border-radius: 20px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+      margin: 0 auto 20px;
+      padding: 0;
       z-index: 10;
-    }
-
-    .container h1 {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 32px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      text-align: center;
-      margin-bottom: 24px;
-      color: #fff;
     }
 
     .center {
       text-align: center;
-      margin-top: 20px;
+      margin-top: 10px;
     }
 
     /* Modal */
@@ -258,22 +248,50 @@
       color: var(--accent-gold);
     }
 
+    /* Responsywność dla małych ekranów telefonów */
     @media (max-width: 650px) {
       .navbar {
-        justify-content: center;
-        text-align: center;
+        padding: 8px 12px;
+        gap: 6px;
+        justify-content: space-between;
+      }
+      .nav-left {
+        font-size: 16px;
+      }
+      .nav-center {
+        font-size: 12px;
+      }
+      .navbar input {
+        width: 95px;
+        padding: 4px 6px;
+        font-size: 11px;
+      }
+      .navbar button, #logoutBox button {
+        padding: 4px 8px;
+        font-size: 11px;
       }
       .download-btn {
         flex-direction: column;
         text-align: center;
-        padding: 20px 24px;
+        padding: 16px 20px;
+        gap: 12px;
+        width: 95%;
+        max-width: 340px;
       }
       .btn-text {
         align-items: center;
         text-align: center;
       }
       .btn-title {
-        font-size: 22px;
+        font-size: 20px;
+      }
+      .btn-sub {
+        font-size: 12px;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .btn-icon {
+        font-size: 32px;
       }
     }
   </style>
@@ -305,7 +323,7 @@
     </div>
   </div>
 
-  <!-- Przycisk pobierania -->
+  <!-- Przycisk pobierania na samym środku strony -->
   <div class="hero-download">
     <a href="Aplikacja 2.15.apk" class="download-btn">
       <span class="btn-icon">⚽</span>
@@ -318,12 +336,8 @@
     </a>
   </div>
 
-  <!-- Główna zawartość / Tabela -->
+  <!-- Ukryty kontener na elementy generowane przez skrypty -->
   <div class="container">
-    <h1>🏆 Tabela punktów chwały</h1>
-
-    <!-- Tutaj main.js wstrzykuje tabelę -->
-
     <div class="center" id="logoutBox" style="display:none;">
       <button onclick="logout()">Wyloguj</button>
     </div>

@@ -9,316 +9,56 @@
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
-    :root {
-      --bg-dark: #05020a;
-      --primary-purple: #7E42C4;
-      --neon-purple: #a855f7;
-      --accent-gold: #FFD700;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-      position: relative;
-      /* Futurystyczne tło z trójkątami i liniami */
-      background-image: 
-        radial-gradient(circle at 50% 20%, rgba(126, 66, 196, 0.3) 0%, transparent 70%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cg fill='none' stroke-width='1.5'%3E%3Cpolygon points='120,80 340,40 220,280' fill='%232e1065' fill-opacity='0.4' stroke='%236b21a8' stroke-opacity='0.6'/%3E%3Cpolygon points='1150,120 1380,220 1210,410' fill='%234c1d95' fill-opacity='0.35' stroke='%237e22ce' stroke-opacity='0.5'/%3E%3Cpolygon points='80,620 290,540 240,820' fill='%233b0764' fill-opacity='0.45' stroke='%239333ea' stroke-opacity='0.5'/%3E%3Cpolygon points='1080,680 1320,610 1260,860' fill='%23581c87' fill-opacity='0.35' stroke='%23a855f7' stroke-opacity='0.5'/%3E%3Cline x1='0' y1='180' x2='520' y2='450' stroke='%236b21a8' stroke-opacity='0.4'/%3E%3Cline x1='1440' y1='140' x2='890' y2='520' stroke='%237e22ce' stroke-opacity='0.4'/%3E%3Ccircle cx='340' cy='40' r='4' fill='%23a855f7' fill-opacity='0.8'/%3E%3Ccircle cx='1210' cy='410' r='4' fill='%23c084fc' fill-opacity='0.8'/%3E%3C/g%3E%3C/svg%3E");
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-    }
-
+    :root { --bg-dark: #05020a; --primary-purple: #7E42C4; --neon-purple: #a855f7; --accent-gold: #FFD700; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg-dark); color: #ffffff; font-family: 'Inter', sans-serif; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; position: relative; /* Futurystyczne tło z trójkątami i liniami */ background-image: radial-gradient(circle at 50% 20%, rgba(126, 66, 196, 0.3) 0%, transparent 70%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1440' height='900' viewBox='0 0 1440 900'%3E%3Cg fill='none' stroke-width='1.5'%3E%3Cpolygon points='120,80 340,40 220,280' fill='%232e1065' fill-opacity='0.4' stroke='%236b21a8' stroke-opacity='0.6'/%3E%3Cpolygon points='1150,120 1380,220 1210,410' fill='%234c1d95' fill-opacity='0.35' stroke='%237e22ce' stroke-opacity='0.5'/%3E%3Cpolygon points='80,620 290,540 240,820' fill='%233b0764' fill-opacity='0.45' stroke='%239333ea' stroke-opacity='0.5'/%3E%3Cpolygon points='1080,680 1320,610 1260,860' fill='%23581c87' fill-opacity='0.35' stroke='%23a855f7' stroke-opacity='0.5'/%3E%3Cline x1='0' y1='180' x2='520' y2='450' stroke='%236b21a8' stroke-opacity='0.4'/%3E%3Cline x1='1440' y1='140' x2='890' y2='520' stroke='%237e22ce' stroke-opacity='0.4'/%3E%3Ccircle cx='340' cy='40' r='4' fill='%23a855f7' fill-opacity='0.8'/%3E%3Ccircle cx='1210' cy='410' r='4' fill='%23c084fc' fill-opacity='0.8'/%3E%3C/g%3E%3C/svg%3E"); background-size: cover; background-position: center; background-attachment: fixed; }
     /* Pasek nawigacji */
-    .navbar {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
-      padding: 14px 24px;
-      background: #100824;
-      border-bottom: 2px solid #9333ea;
-      box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4);
-      z-index: 100;
-    }
-
-    .nav-left {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #fff;
-    }
-
-    .nav-center {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 16px;
-      color: #d8b4fe;
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    #loginBox {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .navbar input {
-      background: #05020a;
-      border: 1px solid #9333ea;
-      color: #fff;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 13px;
-      outline: none;
-      width: 130px;
-    }
-
-    .navbar input:focus {
-      border-color: var(--accent-gold);
-      box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
-    }
-
-    .navbar button, #logoutBox button {
-      background: linear-gradient(135deg, #7e22ce, #a855f7);
-      color: white;
-      border: 1px solid #d8b4fe;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .navbar button:hover {
-      background: linear-gradient(135deg, #9333ea, #c084fc);
-      box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
-    }
-
-    #loginError {
-      color: #f87171;
-      font-size: 12px;
-      width: 100%;
-    }
-
+    .navbar { position: relative; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; padding: 14px 24px; background: #100824; border-bottom: 2px solid #9333ea; box-shadow: 0 4px 20px rgba(147, 51, 234, 0.4); z-index: 100; }
+    .nav-left { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #fff; }
+    .nav-center { font-family: 'Rajdhani', sans-serif; font-size: 16px; color: #d8b4fe; }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    #loginBox { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .navbar input { background: #05020a; border: 1px solid #9333ea; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 13px; outline: none; width: 130px; }
+    .navbar input:focus { border-color: var(--accent-gold); box-shadow: 0 0 8px rgba(255, 215, 0, 0.5); }
+    .navbar button, #logoutBox button { background: linear-gradient(135deg, #7e22ce, #a855f7); color: white; border: 1px solid #d8b4fe; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .navbar button:hover { background: linear-gradient(135deg, #9333ea, #c084fc); box-shadow: 0 0 12px rgba(168, 85, 247, 0.8); }
+    #loginError { color: #f87171; font-size: 12px; width: 100%; }
     /* Główna sekcja z przyciskiem pobierania – na samym środku wysokości strony */
-    .hero-download {
-      flex: 1;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-      z-index: 10;
-    }
-
+    .hero-download { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; z-index: 10; }
     /* Wyśrodkowany, wyraźny przycisk */
-    .download-btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 18px;
-      padding: 22px 40px;
-      background: linear-gradient(135deg, #581c87 0%, #7e22ce 100%);
-      color: #ffffff;
-      text-decoration: none;
-      border-radius: 16px;
-      border: 3px solid var(--accent-gold);
-      box-shadow: 
-        0 0 30px rgba(126, 66, 196, 0.8),
-        0 0 15px rgba(255, 215, 0, 0.5);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .download-btn:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow: 
-        0 10px 40px rgba(168, 85, 247, 1),
-        0 0 25px rgba(255, 215, 0, 0.8);
-    }
-
-    .btn-icon {
-      font-size: 42px;
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
-    }
-
-    .btn-text {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      text-align: left;
-    }
-
-    .btn-title {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 28px;
-      font-weight: 700;
-      line-height: 1.1;
-      text-transform: uppercase;
-    }
-
-    .btn-sub {
-      font-size: 14px;
-      color: #e9d5ff;
-      margin-top: 5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .version-badge {
-      background: var(--accent-gold);
-      color: #05020a;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
+    .download-btn { position: relative; display: inline-flex; align-items: center; gap: 18px; padding: 22px 40px; background: linear-gradient(135deg, #581c87 0%, #7e22ce 100%); color: #ffffff; text-decoration: none; border-radius: 16px; border: 3px solid var(--accent-gold); box-shadow: 0 0 30px rgba(126, 66, 196, 0.8), 0 0 15px rgba(255, 215, 0, 0.5); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .download-btn:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 10px 40px rgba(168, 85, 247, 1), 0 0 25px rgba(255, 215, 0, 0.8); }
+    .btn-icon { font-size: 42px; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7)); }
+    .btn-text { display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+    .btn-title { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; line-height: 1.1; text-transform: uppercase; }
+    .btn-sub { font-size: 14px; color: #e9d5ff; margin-top: 5px; display: flex; align-items: center; gap: 10px; }
+    .version-badge { background: var(--accent-gold); color: #05020a; font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 12px; }
     /* Ukryty kontener na elementy generowane przez skrypty */
-    .container {
-      position: relative;
-      width: 92%;
-      max-width: 1100px;
-      margin: 0 auto 20px;
-      padding: 0;
-      z-index: 10;
-    }
-
-    .center {
-      text-align: center;
-      margin-top: 10px;
-    }
-
+    .container { position: relative; width: 92%; max-width: 1100px; margin: 0 auto 20px; padding: 0; z-index: 10; }
+    .center { text-align: center; margin-top: 10px; }
     /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(5, 2, 10, 0.85);
-    }
-
-    .modal-content {
-      background: #140c28;
-      border: 2px solid var(--neon-purple);
-      box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
-      margin: 10% auto;
-      padding: 25px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 500px;
-      color: #fff;
-      position: relative;
-    }
-
-    .close {
-      color: #d8b4fe;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .close:hover {
-      color: var(--accent-gold);
-    }
-
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(5, 2, 10, 0.85); }
+    .modal-content { background: #140c28; border: 2px solid var(--neon-purple); box-shadow: 0 0 30px rgba(168, 85, 247, 0.6); margin: 10% auto; padding: 25px; border-radius: 16px; width: 90%; max-width: 500px; color: #fff; position: relative; }
+    .close { color: #d8b4fe; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close:hover { color: var(--accent-gold); }
     /* Responsywność dla małych ekranów telefonów (pomniejszenie przycisku burgera 2x i listy 3x) */
     @media (max-width: 650px) {
-      .navbar {
-        flex-direction: column;
-        align-items: center;
-        padding: 8px 10px;
-        gap: 6px;
-        text-align: center;
-      }
-      .nav-left {
-        font-size: 16px;
-      }
-      .nav-center {
-        font-size: 12px;
-      }
-      .nav-right {
-        width: 100%;
-        justify-content: center;
-      }
-      #loginBox {
-        width: 100%;
-        justify-content: center;
-        gap: 4px;
-      }
+      .navbar { flex-direction: column; align-items: center; padding: 8px 10px; gap: 6px; text-align: center; }
+      .nav-left { font-size: 16px; }
+      .nav-center { font-size: 12px; }
+      .nav-right { width: 100%; justify-content: center; }
+      #loginBox { width: 100%; justify-content: center; gap: 4px; }
       /* Przycisk hamburgera / menu zwijanego (zmniejszony o połowę / 2x) */
-      .hamburger, .menu-toggle, .burger {
-        transform: scale(0.5);
-        padding: 2px 4px;
-        font-size: 10px;
-      }
+      .hamburger, .menu-toggle, .burger { transform: scale(0.5); padding: 2px 4px; font-size: 10px; }
       /* Lista rozwijana / menu (zmniejszona o ok. 3x) */
-      .dropdown-content, .nav-menu, .menu, .dropdown {
-        transform: scale(0.33);
-        transform-origin: top right;
-        font-size: 9px;
-      }
-      .navbar input {
-        flex: 1;
-        min-width: 90px;
-        max-width: 110px;
-        padding: 4px 6px;
-        font-size: 11px;
-      }
-      .navbar button, #logoutBox button {
-        padding: 4px 8px;
-        font-size: 11px;
-      }
-      .download-btn {
-        flex-direction: column;
-        text-align: center;
-        padding: 16px 20px;
-        gap: 12px;
-        width: 95%;
-        max-width: 340px;
-      }
-      .btn-text {
-        align-items: center;
-        text-align: center;
-      }
-      .btn-title {
-        font-size: 20px;
-      }
-      .btn-sub {
-        font-size: 12px;
-        flex-direction: column;
-        gap: 4px;
-      }
-      .btn-icon {
-        font-size: 34px;
-      }
+      .dropdown-content, .nav-menu, .menu, .dropdown { transform: scale(0.33); transform-origin: top right; font-size: 9px; }
+      .navbar input { flex: 1; min-width: 90px; max-width: 110px; padding: 4px 6px; font-size: 11px; }
+      .navbar button, #logoutBox button { padding: 4px 8px; font-size: 11px; }
+      .download-btn { flex-direction: column; text-align: center; padding: 16px 20px; gap: 12px; width: 95%; max-width: 340px; }
+      .btn-text { align-items: center; text-align: center; }
+      .btn-title { font-size: 20px; }
+      .btn-sub { font-size: 12px; flex-direction: column; gap: 4px; }
+      .btn-icon { font-size: 34px; }
     }
   </style>
 </head>
@@ -351,12 +91,12 @@
 
   <!-- Przycisk pobierania na samym środku strony -->
   <div class="hero-download">
-    <a href="Aplikacja 2.16.apk" class="download-btn">
+    <a href="Aplikacja 2.17.apk" class="download-btn">
       <span class="btn-icon">⚽</span>
       <div class="btn-text">
         <span class="btn-title">Pobierz aplikację Punktów Chwały</span>
         <span class="btn-sub">
-          Tylko na Android! <span class="version-badge">Wersja 2.16</span>
+          Tylko na Android! <span class="version-badge">Wersja 2.17</span>
         </span>
       </div>
     </a>
